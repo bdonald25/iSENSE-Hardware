@@ -12,10 +12,6 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-    <instrumentation
-        android:name="android.test.InstrumentationTestRunner"
-        android:targetPackage="edu.uml.cs.isense.carphysicsv2" />
-
     <activity
         android:name="edu.uml.cs.isense.queue.QueueLayout"
         android:label="Upload Data"
@@ -102,9 +98,7 @@
 
         <activity
             android:name="edu.uml.cs.isense.carphysicsv2.CarRampPhysicsV2"
-            android:configChanges="orientation|keyboardHidden"
-            android:label="@string/display_name"
-            android:theme="@style/AppTheme" >
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -112,28 +106,18 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="edu.uml.cs.isense.carphysicsv2.RecordSettings"
-            android:label="@string/recordSettings"
-            android:theme="@style/AppThemeDialog" >
-        </activity>
-        <activity
-            android:name="edu.uml.cs.isense.carphysicsv2.dialogs.About"
-            android:label="@string/about_title"
+            android:name="edu.uml.cs.isense.carphysicsv2.About"
+            android:label="@string/about"
             android:theme="@style/AppTheme" >
         </activity>
         <activity
-            android:name="edu.uml.cs.isense.carphysicsv2.dialogs.Help"
-            android:label="@string/help_title"
-            android:theme="@style/AppTheme" >
-        </activity>
-        <activity
-            android:name="edu.uml.cs.isense.carphysicsv2.DataActivity"
-            android:label="@string/upload_or_trash"
+            android:name="edu.uml.cs.isense.carphysicsv2.Help"
+            android:label="@string/help"
             android:theme="@style/AppTheme" >
         </activity>
         <activity
             android:name="edu.uml.cs.isense.proj.Setup"
-            android:label="@string/choose_project_title"
+            android:label="@string/setup"
             android:theme="@style/AppThemeDialog" >
         </activity>
         <activity
@@ -143,7 +127,7 @@
         </activity>
         <activity
             android:name="edu.uml.cs.isense.proj.NoQR"
-            android:label="@string/no_qr"
+            android:label="@string/qr_prompt"
             android:theme="@style/AppThemeDialog" >
         </activity>
         <activity
@@ -179,32 +163,12 @@
             android:label="@string/enter_name_prompt"
             android:theme="@style/AppThemeDialog" />
         <activity
-            android:name="edu.uml.cs.isense.carphysicsv2.MessageDialogTemplate"
-            android:label="Output a message"
-            android:theme="@style/AppThemeDialog" />
-        <activity
-            android:name="edu.uml.cs.isense.carphysicsv2.SingleInputDialogTemplate"
-            android:label="Single input"
-            android:theme="@style/AppThemeDialog" />
-        <activity
-            android:name="edu.uml.cs.isense.carphysicsv2.ViewData"
-            android:label="Single input"
-            android:theme="@style/AppThemeDialog" />
-        <activity
-            android:name="edu.uml.cs.isense.carphysicsv2.ResetToDefaults"
-            android:label="Single input"
-            android:theme="@style/AppThemeDialog" />
-        <activity
-            android:name="edu.uml.cs.isense.carphysicsv2.SaveModeDialog"
-            android:label="Save Mode?"
-            android:theme="@style/AppThemeDialog" />
-        <activity
             android:name="edu.uml.cs.isense.queue.QueueDeleteSelected"
             android:label="Delete Selected Data Sets"
             android:theme="@style/AppThemeDialog" />
         <activity
             android:name="edu.uml.cs.isense.proj.ProjectNameDialog"
-            android:label="@string/new_proj_name_title"
+            android:label="@string/selectProject"
             android:theme="@style/AppThemeDialog" />
         <activity
             android:name="edu.uml.cs.isense.credentials.ClassroomMode"
@@ -218,10 +182,6 @@
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name="edu.uml.cs.isense.credentials.CredentialManagerKey"
-            android:label="Add Contributor Key"
-            android:theme="@style/AppThemeDialog" />
-        <activity
-            android:name="edu.uml.cs.isense.carphysicsv2.dialogs.ContributorKeyDialog"
             android:label="Add Contributor Key"
             android:theme="@style/AppThemeDialog" />
     </application>

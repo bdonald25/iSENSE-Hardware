@@ -1,21 +1,20 @@
-package edu.uml.cs.isense.carphysicsv2.dialogs;
+package edu.uml.cs.isense.carphysicsv2;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import edu.uml.cs.isense.carphysicsv2.R;
 
-public class About extends Activity {
-
+public class Help extends Activity {
 	private Button okButton;
 
+	@Override
 	public void onCreate(Bundle savedInstanceBundle) {
 		super.onCreate(savedInstanceBundle);
-		setContentView(R.layout.about);
+		setContentView(R.layout.help);
 
+		// Creates the OK button so users can leave
 		okButton = (Button) findViewById(R.id.okButton);
-
 		okButton.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -23,6 +22,6 @@ public class About extends Activity {
 				finish();
 			}
 		});
-	}
 
+	}
 }

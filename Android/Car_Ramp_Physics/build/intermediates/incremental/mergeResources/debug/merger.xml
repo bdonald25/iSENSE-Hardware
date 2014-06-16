@@ -1190,8 +1190,33 @@ showHome|useLogo
     <dataSet config="main" >
         <source path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res" >
             <file
-                name="button_rsense_green"
-                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/drawable/button_rsense_green.xml"
+                name="background"
+                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/drawable/background.xml"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="button_rsense"
+                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/drawable/button_rsense.xml"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="button_rsense_stop"
+                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/drawable/button_rsense_stop.xml"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="colorless"
+                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/drawable/colorless.xml"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="main_background"
+                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/drawable/main_background.xml"
+                qualifiers=""
+                type="drawable" />
+            <file
+                name="progress_small"
+                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/drawable/progress_small.xml"
                 qualifiers=""
                 type="drawable" />
             <file
@@ -1200,8 +1225,43 @@ showHome|useLogo
                 qualifiers="hdpi-v4"
                 type="drawable" />
             <file
+                name="spinner_black_16"
+                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/drawable-hdpi/spinner_black_16.png"
+                qualifiers="hdpi-v4"
+                type="drawable" />
+            <file
                 name="ic_launcher"
                 path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/drawable-mdpi/ic_launcher.png"
+                qualifiers="mdpi-v4"
+                type="drawable" />
+            <file
+                name="ic_menu_login"
+                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/drawable-mdpi/ic_menu_login.png"
+                qualifiers="mdpi-v4"
+                type="drawable" />
+            <file
+                name="ic_menu_media"
+                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/drawable-mdpi/ic_menu_media.png"
+                qualifiers="mdpi-v4"
+                type="drawable" />
+            <file
+                name="ic_menu_settings"
+                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/drawable-mdpi/ic_menu_settings.png"
+                qualifiers="mdpi-v4"
+                type="drawable" />
+            <file
+                name="ic_menu_synctime"
+                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/drawable-mdpi/ic_menu_synctime.png"
+                qualifiers="mdpi-v4"
+                type="drawable" />
+            <file
+                name="ic_menu_upload"
+                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/drawable-mdpi/ic_menu_upload.png"
+                qualifiers="mdpi-v4"
+                type="drawable" />
+            <file
+                name="spinner_black_16"
+                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/drawable-mdpi/spinner_black_16.png"
                 qualifiers="mdpi-v4"
                 type="drawable" />
             <file
@@ -1210,8 +1270,13 @@ showHome|useLogo
                 qualifiers="xhdpi-v4"
                 type="drawable" />
             <file
-                name="logo"
-                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/drawable-xhdpi/logo.png"
+                name="rsense_logo"
+                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/drawable-xhdpi/rsense_logo.png"
+                qualifiers="xhdpi-v4"
+                type="drawable" />
+            <file
+                name="spinner_black_16"
+                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/drawable-xhdpi/spinner_black_16.png"
                 qualifiers="xhdpi-v4"
                 type="drawable" />
             <file
@@ -1220,13 +1285,18 @@ showHome|useLogo
                 qualifiers="xxhdpi-v4"
                 type="drawable" />
             <file
+                name="spinner_black_16"
+                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/drawable-xxhdpi/spinner_black_16.png"
+                qualifiers="xxhdpi-v4"
+                type="drawable" />
+            <file
                 name="about"
                 path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout/about.xml"
                 qualifiers=""
                 type="layout" />
             <file
-                name="contrib_key"
-                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout/contrib_key.xml"
+                name="configuration"
+                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout/configuration.xml"
                 qualifiers=""
                 type="layout" />
             <file
@@ -1235,123 +1305,28 @@ showHome|useLogo
                 qualifiers=""
                 type="layout" />
             <file
-                name="login"
-                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout/login.xml"
-                qualifiers=""
-                type="layout" />
-            <file
                 name="main"
                 path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout/main.xml"
                 qualifiers=""
                 type="layout" />
             <file
-                name="message_template"
-                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout/message_template.xml"
+                name="media_manager"
+                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout/media_manager.xml"
                 qualifiers=""
                 type="layout" />
             <file
-                name="record_settings"
-                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout/record_settings.xml"
+                name="summary"
+                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout/summary.xml"
                 qualifiers=""
                 type="layout" />
             <file
-                name="reset"
-                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout/reset.xml"
-                qualifiers=""
+                name="configuration"
+                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout-v11/configuration.xml"
+                qualifiers="v11"
                 type="layout" />
             <file
-                name="save_mode_dialog"
-                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout/save_mode_dialog.xml"
-                qualifiers=""
-                type="layout" />
-            <file
-                name="single_input_template"
-                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout/single_input_template.xml"
-                qualifiers=""
-                type="layout" />
-            <file
-                name="upload_or_trash"
-                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout/upload_or_trash.xml"
-                qualifiers=""
-                type="layout" />
-            <file
-                name="view_data"
-                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout/view_data.xml"
-                qualifiers=""
-                type="layout" />
-            <file
-                name="main"
-                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout-land/main.xml"
-                qualifiers="land"
-                type="layout" />
-            <file
-                name="record_settings"
-                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout-land/record_settings.xml"
-                qualifiers="land"
-                type="layout" />
-            <file
-                name="main"
-                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout-land-v14/main.xml"
-                qualifiers="land-v14"
-                type="layout" />
-            <file
-                name="record_settings"
-                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout-land-v14/record_settings.xml"
-                qualifiers="land-v14"
-                type="layout" />
-            <file
-                name="contrib_key"
-                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout-v14/contrib_key.xml"
-                qualifiers="v14"
-                type="layout" />
-            <file
-                name="login"
-                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout-v14/login.xml"
-                qualifiers="v14"
-                type="layout" />
-            <file
-                name="main"
-                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout-v14/main.xml"
-                qualifiers="v14"
-                type="layout" />
-            <file
-                name="message_template"
-                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout-v14/message_template.xml"
-                qualifiers="v14"
-                type="layout" />
-            <file
-                name="record_settings"
-                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout-v14/record_settings.xml"
-                qualifiers="v14"
-                type="layout" />
-            <file
-                name="reset"
-                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout-v14/reset.xml"
-                qualifiers="v14"
-                type="layout" />
-            <file
-                name="save_mode_dialog"
-                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout-v14/save_mode_dialog.xml"
-                qualifiers="v14"
-                type="layout" />
-            <file
-                name="single_input_template"
-                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout-v14/single_input_template.xml"
-                qualifiers="v14"
-                type="layout" />
-            <file
-                name="upload_or_trash"
-                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout-v14/upload_or_trash.xml"
-                qualifiers="v14"
-                type="layout" />
-            <file
-                name="view_data"
-                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/layout-v14/view_data.xml"
-                qualifiers="v14"
-                type="layout" />
-            <file
-                name="main"
-                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/menu/main.xml"
+                name="menu"
+                path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/menu/menu.xml"
                 qualifiers=""
                 type="menu" />
             <file
@@ -1362,113 +1337,354 @@ showHome|useLogo
             <file
                 path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/res/values/strings.xml"
                 qualifiers="" >
+                <string name="startString" >START\n(Press and Hold)
+                </string>
                 <string name="done" >Done
                 </string>
-                <string name="logged_in_as" >Logged in as: 
+                <string name="iSenseConfig" ><u>
+                        <b>
+iSENSE Configurations
+                        </b>
+                    </u></string>
+                <string name="takeVid" >Take a Video"
                 </string>
-                <string name="help_app" >\nHow to Create a Project for this App:\n\n1. Go to isenseproject.org\n\n2. Login or Register for an Account.\n\n3. Click on Projects.\n\n4. Click on Create Project.\n\n5. Enter a name for your project, then click finish. \n\n6. Enter a Description.\n\n7. When formatting the project, the fields should be as follows:\n\n 
-Name:\t\t\t\t\t\t\t\t\tType:\n\n
-Timestamp\t\t\t\t\t\tTimestamp\n
-Accel-X\t\t\t\t\t\t\t\t\tNumber\n
-Accel-Y\t\t\t\t\t\t\t\t\tNumber\n
-Accel-Z\t\t\t\t\t\t\t\t\tNumber\n
-Accel-Mag\t\t\t\t\t\t\tNumber\n\n
-8. Your project\'s QR code is shown near the top left corner of the page and the project number will be listed two lines under the project\'s title.\n\n9. Remember to change the project number in the app to match your project number!\n\nYou may also use the Create a Project feature in this app by clicking on the data recorded in the upload menu then pressing “Select Project” and then selecting “Create New Project” from the new menu that pops up. This will allow you to create a new project with the proper fields set up for you.
+                <string name="picAndVidCount" >Pictures and Videos taken: \0
                 </string>
-                <string name="no_qr" >No QR Scanner
-                </string>
-                <string name="blankContentDesc" ></string>
-                <string name="lastInitial" > Last Initial: 
-                </string>
-                <string name="userName" >Username
+                <string name="stopString" >STOP\n(Press and Hold)
                 </string>
                 <string name="upload" >Upload
                 </string>
-                <string name="display_name" >iS Car Ramp Physics
+                <string name="uploadPicture" >Upload a Picture
                 </string>
-                <string name="SaveMsg" >Would you like to use the app in save mode instead?
+                <string name="selectProject" >Select a Project
                 </string>
-                <string name="mag" >Magnitude
+                <string name="project_prompt" >Select a Project
                 </string>
-                <string name="upload_or_trash" >Upload Data or Throw It Away
+                <string name="media" >Media
                 </string>
-                <string name="discard" >Discard
+                <string name="browse" >  Browse…  
                 </string>
-                <string name="digits_restriction" >	    ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz -_.,01234567879()@
+                <string name="aboutApp" >About:\n\nThis app enables you to record your location and accel/magn in all directions while riding any ride at Canobie Lake Park, and it allows you to share that data online. When the app is activated, your data is saved once every 200ms and then can be shared on the iSENSE web system (isenseproject.org), where the data can be viewed publicly. The recording interval can be changed via the Setup option in the Menu. In order to allow you to find your contributed data easily, the app asks you to enter your first name and last initial. If you are not comfortable with this information being posted on the web, please refrain from using this application.\n\nInstructions:\n\n In order to begin recording and sharing data, first click Setup and then enter your first name and last initial, the sample interval in which you would like data to be recorded, the project you would like the data to be uploaded to and the ride you are going record data on. After pressing Okay, press and hold the button that says \"Start.\" This allows data to be recorded and saved. When you are ready to stop recording, press and hold the button that says \"Stop.\" While data is being recorded, please refrain from exiting the app by pressing the Back button. Pressing the Home button will interrupt the recording but your data will remain saved. When you are ready to upload your data, click on the Upload option in the menu.
                 </string>
 
-                <string-array name="lengths_array" >
+                <string-array name="canobie_array" >
                     <item>
-1 sec
+Unknown
                     </item>
                     <item>
-2 sec
+Alpine Swing
                     </item>
                     <item>
-5 sec
+Antique Carousel
                     </item>
                     <item>
-10 sec
+Antique Cars
                     </item>
                     <item>
-30 sec
+Blue Heron
                     </item>
                     <item>
-60 sec
+Boston Harbor Patrol
+                    </item>
+                    <item>
+Boston Tea Party
+                    </item>
+                    <item>
+Canobie 500
+                    </item>
+                    <item>
+Canobie Express
+                    </item>
+                    <item>
+Caterpillar
+                    </item>
+                    <item>
+Corkscrew
+                    </item>
+                    <item>
+Crazy Cups
+                    </item>
+                    <item>
+daVinvi\'s Dream
+                    </item>
+                    <item>
+Dodgems
+                    </item>
+                    <item>
+Dragon Coaster
+                    </item>
+                    <item>
+Equinox
+                    </item>
+                    <item>
+Giant Sky Wheel
+                    </item>
+                    <item>
+Jungle Bounce
+                    </item>
+                    <item>
+Junior Sports Cars
+                    </item>
+                    <item>
+Kiddie Carousel
+                    </item>
+                    <item>
+Log Flume
+                    </item>
+                    <item>
+Mine of Lost Souls
+                    </item>
+                    <item>
+Over the Rainbow
+                    </item>
+                    <item>
+Pirate Ship
+                    </item>
+                    <item>
+Psychodrome
+                    </item>
+                    <item>
+Rowdy Rousters
+                    </item>
+                    <item>
+Skater
+                    </item>
+                    <item>
+Sky Ride
+                    </item>
+                    <item>
+Star Blaster
+                    </item>
+                    <item>
+Tiki Maze
+                    </item>
+                    <item>
+Turkish Twist
+                    </item>
+                    <item>
+Twist and Shout
+                    </item>
+                    <item>
+Untamed
+                    </item>
+                    <item>
+Wave Blaster
+                    </item>
+                    <item>
+Wipeout
+                    </item>
+                    <item>
+Xtreme Frisbee
+                    </item>
+                    <item>
+Yankee Cannonball
+                    </item>
+                    <item>
+Zero Gravity
                     </item>
                 </string-array>
 
-                <string name="firstName" > First Name: 
+                <string name="rides_prompt" >Choose a ride
                 </string>
-                <string name="about_title" >About
+                <string name="help" >Help
                 </string>
-                <string name="publish" >Publish
+                <string name="retry" >Try Again
                 </string>
-                <string name="yString" >Y: 
+                <string name="canobieRides" >Canobie Lake Park Rides
                 </string>
-                <string name="not_logged_in" >Not Logged In
+                <string name="sessionName" >First Name/Last Initial: 
                 </string>
-                <string name="about_app" >About:\n\nThis app enables you to record your accel/magn in all directions and it allows you to share that data online. When the app is activated, your data is collected for ten seconds and then saved so that it can later be shared on the iSENSE web system (isenseproject.org), where it can be viewed publicly. The recording length can be changed via the Menu. In order to allow you to find your contributed data easily, the app asks you to enter your first name and last initial. If you are not comfortable with this information being posted on the web, please refrain from using this application.\n\nInstructions:\n\n In order to begin recording and sharing data, first enter your first name and last initial. Next, choose the sample length in which you would like data to be recorded, this can be done via the \"Recording Length\" menu option. Choose the project you would like the data to be uploaded to by going to the \"Select Project\" menu option. Finally, when you are ready to begin recording data press and hold the button that says \"Hold to Start.\" This allows data to be recorded and saved. When you are ready to upload your data, click on the Upload option in the menu. While data is being recorded, you will not be able to exit the app by pressing the Back button. Pressing the Home button will interrupt the recording. 
+                <string name="select_fields_for" >	    Please select the fields you would like to record for project #
                 </string>
-                <string name="record_length" >Recording Length
+                <string name="receive" >Receive
                 </string>
-                <string name="InternetMsg" >	    Cannot establish internet connectivity with this device.  You will not be able to upload data to iSENSE
-	    until this device is connected to the internet.
+                <string name="projectNum" >Project: Not Selected 
                 </string>
-                <string name="new_proj_name_title" >Create New Project
+                <string name="sample_rate" >Sample Interval (milli-seconds): 
                 </string>
-                <string name="login_title" >Login
+                <string name="send" >Send
                 </string>
-                <string name="tryAgain" >Try Again
+                <string name="takePic" >Take a Picture
                 </string>
-                <string name="view" >View
+                <string name="syncTime" >	    Synchronizing time is useful when using multiple devices on a ride at the
+	    same time.  By default, many Android devices\' clocks will not match one
+	    another\'s, thus making recording data at similar times difficult.  However,
+	    you have a choice to fix this issue by setting a device as a \"host\".
+	    This can be done by hitting the \"Send\" button.  Upon hitting \"Send\", 
+	    the time from that particular Android device will be broadcasted as a timeframe
+	    that all other phones in the local network can receive.  However, in order for
+	    a phone to receive a broadcasted time, that phone must be currently in 
+	    receive-mode, which can be done by hitting \"Receive\".  In other words, if
+	    you intend on receiving a host\'s time, you must be in receive-mode before the
+	    host hits \"Send\". (By default, \"Send\" will also receive the time that you have 
+	    broadcasted, should you be the host).  After pressing either \"Send\" or 
+	    \"Receive\", a dialog box will tell you the time that has been received from
+	    the host, along with the millisecond offset between 
+	    the received time and your Android device\'s actual clock.  If you do choose 
+	    to synchronize time, recording data will now use the received time as a label 
+	    for data points, rather than using your local time.  This now allows 
+	    simultaneous data recording across multiple devices on the same ride at the 
+	    same time.  Please note: synchronizing time will only work if all the Android
+	    devices are connected to the same WiFi network.  Mobile plans (e.g. 3G or 4G)
+	    generally will not allow for synchronizing time.  Also, synchronizing time may not be
+	    allowed on some WiFi networks, but it generally works on small, password-secured 
+	    WiFi networks.
                 </string>
-                <string name="app_name" >iSENSE Car Ramp Physics
+                <string name="rideAndSeat" >Ride: 
                 </string>
-                <string name="saveMode" >Save Mode
+                <string name="display_name" >iS Canobie Physics
                 </string>
-                <string name="Z" >Z
+                <string name="loading" >Loading…
                 </string>
-                <string name="help_title" >Help
+                <string name="cancel" >Cancel
                 </string>
-                <string name="choose_project_title" >Select Project
+                <string name="timeFailed" >Failed to synchronize time.  You may try again.
                 </string>
-                <string name="changename" >Change Name
+                <string name="ok" >OK
                 </string>
-                <string name="holdToStart" >Hold to Start
+                <string name="exit" >Exit
                 </string>
-                <string name="X" >X
+                <string name="login" >Login
                 </string>
-                <string name="Y" >Y
+                <string name="otherConfig" ><u>
+                        <b>
+Ride Configurations
+                        </b>
+                    </u></string>
+                <string name="about" >About
                 </string>
-                <string name="gravity" >Include Gravity:   
+                <string name="prompt" >Would you like to retry uploading any of the following?
                 </string>
-                <string name="recordSettings" >Recording Fields
+                <string name="project_name_dialog" >Create a Project
                 </string>
-                <string name="reset" >Reset Settings
+                <string name="search" >Search
                 </string>
-                <string name="placeDevice" >Place device on its back with the top edge facing the direction of displacement.
+                <string name="instructions" >Instructions:
                 </string>
+                <string name="select_later" >I\'ll select one later
+                </string>
+                <string name="Help" >\nHow to Create a Project for this App:\n\n1. Go to isenseproject.org\n\n2. Login or Register for an Account.\n\n3. Click on Projects.\n\n4. Click on Create Project.\n\n5. Enter a name for your project, then click finish. \n\n6. Enter a Description.\n\n7. When formatting the project, the fields should be as follows:\n\n 
+Name:\t\t\t\t\t\t\t\t\tType:\n\n
+Timestamp\t\t\t\t\t\tTimestamp\n
+accel-x\t\t\t\t\t\t\t\t\tNumber\n
+accel-y\t\t\t\t\t\t\t\t\tNumber\n
+accel-z\t\t\t\t\t\t\t\t\tNumber\n
+accel-mag\t\t\t\t\t\t\tNumber\n
+magnetic-x\t\t\t\t\t\tNumber\n
+magnetic-y\t\t\t\t\t\tNumber\n
+magnetic-z\t\t\t\t\t\tNumber\n
+magnetic-mag\t\t\t\tNumber\n
+Latitude\t\t\t\t\t\t\t\tLatitude\n
+Longitude\t\t\t\t\t\t\tLongitude\n\n
+8. Your project\'s QR code is shown near the top left corner of the page and the project number will be listed two lines under the project\'s title.\n\n9. Remember to change the project number in the app to match your project number!\n\nYou may also use the Create a Project feature in this app by clicking on the data recorded in the upload menu then pressing “Select Project” and then selecting “Create New Project” from the new menu that pops up. This will allow you to create a new project with the proper fields set up for you.
+                </string>
+                <string name="menuDirections" >Use Menu to Access Configurations
+                </string>
+                <string name="media_desc" >Select one of the following options:
+                </string>
+                <string name="xyz" >Ax:\nAy:\nAz:
+                </string>
+                <string name="experiments_no_items" >No experiments were found.
+                </string>
+                <string name="setup" >Setup
+                </string>
+                <string name="login_prompt_error" >Login Error
+                </string>
+                <string name="timeElapsed" >Time Elapsed: 0:00
+                </string>
+                <string name="app_name" >Canobie Physics
+                </string>
+                <string name="ride" >Ride: 
+                </string>
+                <string name="notLoggedIn" > Not Logged In
+                </string>
+
+                <string-array name="rides_array" >
+                    <item>
+Unknown
+                    </item>
+                    <item>
+Bumper Cars
+                    </item>
+                    <item>
+Carousel
+                    </item>
+                    <item>
+Drop Tower
+                    </item>
+                    <item>
+Ferris Wheel
+                    </item>
+                    <item>
+Frisbee
+                    </item>
+                    <item>
+Gravitron
+                    </item>
+                    <item>
+Jump-and-Smile
+                    </item>
+                    <item>
+Kiddie Ride
+                    </item>
+                    <item>
+Log Flume
+                    </item>
+                    <item>
+Matterhorn
+                    </item>
+                    <item>
+Orbiter
+                    </item>
+                    <item>
+Other
+                    </item>
+                    <item>
+Pirate Ship
+                    </item>
+                    <item>
+Railway
+                    </item>
+                    <item>
+River Rafting
+                    </item>
+                    <item>
+Roller Coaster (wooden)
+                    </item>
+                    <item>
+Roller Coaster (steel)
+                    </item>
+                    <item>
+Rotor
+                    </item>
+                    <item>
+Scrambler
+                    </item>
+                    <item>
+Slide
+                    </item>
+                    <item>
+Speed
+                    </item>
+                    <item>
+Swings
+                    </item>
+                    <item>
+Teacups
+                    </item>
+                    <item>
+Tilt-A-Whirl
+                    </item>
+                    <item>
+Wipeout
+                    </item>
+                    <item>
+Zero Gravity
+                    </item>
+                    <item>
+Zipper
+                    </item>
+                </string-array>
             </file>
         </source>
         <source path="/Users/bobbydonald/iSENSE-Hardware/Android/Car_Ramp_Physics/build/generated/res/rs/debug" />

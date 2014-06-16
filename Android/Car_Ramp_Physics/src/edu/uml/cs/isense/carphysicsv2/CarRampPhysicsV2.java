@@ -1,32 +1,20 @@
 /***************************************************************************************************/
 /***************************************************************************************************/
 /**                                                                                               **/
-/**      IIIIIIIIIIIII               iSENSE Car Ramp Physics App                 SSSSSSSSS        **/
+/**      IIIIIIIIIIIII            General Purpose Amusement Park Application      SSSSSSSSS       **/
 /**           III                                                               SSS               **/
-/**           III                    By: Michael Stowell                       SSS                **/
-/**           III                    and Virinchi Balabhadrapatruni           SSS                 **/
-/**           III                    Some Code From: iSENSE Amusement Park      SSS               **/
-/**           III                                    App (John Fertita)          SSSSSSSSS        **/
+/**           III                    Original Creator: John Fertita            SSS                **/
+/**           III                    Optimized By:     Jeremy Poulin,           SSS               **/
+/**           III                                      Michael Stowell           SSSSSSSSS        **/
 /**           III                    Faculty Advisor:  Fred Martin                      SSS       **/
-/**           III                    Group:            ECG,                              SSS      **/
-/**           III                                      iSENSE                           SSS       **/
+/**           III                    Special Thanks:   Don Rhine                         SSS      **/
+/**           III                    Group:            ECG, iSENSE                      SSS       **/
 /**      IIIIIIIIIIIII               Property:         UMass Lowell              SSSSSSSSS        **/
 /**                                                                                               **/
 /***************************************************************************************************/
 /***************************************************************************************************/
 
 package edu.uml.cs.isense.carphysicsv2;
-
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
@@ -35,6 +23,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -42,738 +31,482 @@ import android.hardware.SensorManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
+import android.location.LocationManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
+import android.os.Environment;
+import android.os.Vibrator;
+import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnLongClickListener;
-import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.Switch;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.ToggleButton;
-import edu.uml.cs.isense.carphysicsv2.dialogs.About;
-import edu.uml.cs.isense.carphysicsv2.dialogs.ContributorKeyDialog;
-import edu.uml.cs.isense.carphysicsv2.dialogs.Help;
+
+import org.json.JSONArray;
+
+import java.io.File;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import edu.uml.cs.isense.comm.API;
-import edu.uml.cs.isense.comm.Connection;
-import edu.uml.cs.isense.credentials.ClassroomMode;
 import edu.uml.cs.isense.credentials.CredentialManager;
-import edu.uml.cs.isense.credentials.EnterName;
 import edu.uml.cs.isense.dfm.DataFieldManager;
-import edu.uml.cs.isense.dfm.FieldMatching;
 import edu.uml.cs.isense.dfm.Fields;
-import edu.uml.cs.isense.objects.RPerson;
 import edu.uml.cs.isense.proj.Setup;
 import edu.uml.cs.isense.queue.QDataSet;
 import edu.uml.cs.isense.queue.QueueLayout;
 import edu.uml.cs.isense.queue.UploadQueue;
-import edu.uml.cs.isense.supplements.OrientationManager;
 import edu.uml.cs.isense.waffle.Waffle;
+
 
 public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 		LocationListener {
 
-	public static String projectNumber = "-1";
-	public static final String DEFAULT_PROJ = "-1";
-	public static boolean useDev = false;
-	public static boolean promptForName = true;
+	/* Default Constants */
+	private final String ACTIVITY_NAME = "canobielake";
+	private final String TIME_OFFSET_PREFS_ID = "time_offset";
+	private final String TIME_OFFSET_KEY = "timeOffset";
 
-	public static final String VIS_URL_PROD = "http://isenseproject.org/projects/";
-	public static final String VIS_URL_DEV = "http://rsense-dev.cs.uml.edu/projects/";
-	public static String baseDataSetUrl = "";
-	public static String dataSetUrl = "";
-
-	public static String RECORD_SETTINGS = "RECORD_SETTINGS";
-
-	private Button startStop;
+	/* UI Handles */
+	public static EditText experimentInput;
+	public static TextView rideName;
+	private TextView time;
 	private TextView values;
-	public static Boolean running = false;
+	private Button startStop;
+	private ToggleButton gravity;
+	public static EditText dataset; 
+	public static EditText project;
+	public static CheckBox projectLater;
+	public static EditText sampleRate;
+	public static EditText studentNumber;
+	public static CheckBox isCanobie;
+	
+	/* Recording Constants */
+	private final int SAMPLE_INTERVAL = 200;
+	private final int DATA_POINT_LIMIT = 3000;
+	
+	/*Values obtained from Configuration*/
+	public static int projectNum = -1;
+	public static String dataName = "";
+	public static String rate = "200";
+	public static String rideNameString = "NOT SET";
+	public static String stNumber = "1";
+	public static Boolean projectLaterChecked = false;
+	public static Boolean canobieChecked = true;
+	public static int spinnerid = 0;
 
+	
+	/* Managers and Their Variables */
+	public static DataFieldManager dfm;
 	private SensorManager mSensorManager;
-
-	public static Location loc;
-	private float accel[];
-	private Timer timeTimer;
-	private int INTERVAL = 50;
-
-	public DataFieldManager dfm;
-	public Fields f;
-	public API api;
-
-	private int countdown;
-
-	static String firstName = "";
-	static String lastInitial = "";
-
-	public static final int RESULT_GOT_NAME = 1098;
-	public static final int UPLOAD_OK_REQUESTED = 90000;
-	public static final int LOGIN_STATUS_REQUESTED = 6005;
-	public static final int RECORDING_LENGTH_REQUESTED = 4009;
-	public static final int PROJECT_REQUESTED = 9000;
-	public static final int QUEUE_UPLOAD_REQUESTED = 5000;
-	public static final int RESET_REQUESTED = 6003;
-	public static final int SAVE_MODE_REQUESTED = 10005;
-	public static final String ACCEL_SETTINGS = "ACCEL_SETTINGS";
-	private static final int FIELD_MATCHING_REQUESTED = 7498;
-	private static final int ALTER_DATA_PROJ_REQUESTED = 6698;
-
-	private boolean timeHasElapsed = false;
-	private boolean usedHomeButton = false;
-
-	private MediaPlayer mMediaPlayer;
-
-	private int elapsedMillis = 0;
-
-	DecimalFormat toThou = new DecimalFormat("######0.000");
-
-	int i = 0;
-	int len = 0;
-	int len2 = 0;
-	int length;
-
-	ProgressDialog dia;
-	double partialProg = 1.0;
-
-	public static String nameOfDataSet = "";
-
-	static boolean inPausedState = false;
-	static boolean useMenu = true;
-	static boolean setupDone = false;
-	static boolean choiceViaMenu = false;
-	static boolean dontToastMeTwice = false;
-	static boolean exitAppViaBack = false;
-	static boolean dontPromptMeTwice = false;
-
-	private static JSONObject dataToUpload;
-	
-	private Handler mHandler;
-	public static JSONArray dataSet;
-
-	long currentTime;
-
-	public static Context mContext;
-
-	public static TextView loggedInAs;
-	private Waffle w;
-	public static boolean inApp = false;
-
+	private LocationManager mLocationManager;
+	private LocationManager mRoughLocManager;
+	private Location loc;
+	private Timer recordingTimer;
 	public static UploadQueue uq;
+	private Vibrator vibrator;
 
-	public static Bundle saved;
+	/* Other Important Objects */
+	private LinkedList<String> acceptedFields;
+	private Fields f;
+	private String dataToBeWrittenToFile;
+	private MediaPlayer mMediaPlayer;
+	private API api;
+	public static Context mContext;
+	private Waffle w;
 
-	public static Menu menu;
+	/* Work Flow Variables */
+	private boolean isRunning = false;
+	private static boolean useMenu = true;
+	public static boolean setupDone = false;
+
 	
-	private Switch switchGravity;
 
+	/* Recording Variables */
+	private float rawAccel[];
+	private float rawMag[];
+	private float accel[];
+	private float orientation[];
+	private float mag[];
+	private String temperature = "";
+	private String pressure = "";
+	private String light = "";
+	private long srate = SAMPLE_INTERVAL;
+	private boolean includeGravity = true;
+
+	/* Menu Items */
+	private final int MENU_ITEM_SETUP = 0;
+	private final int MENU_ITEM_LOGIN = 1;
+	private final int MENU_ITEM_UPLOAD = 2;
+	//private final int MENU_ITEM_TIME = 3;
+	//private final int MENU_ITEM_MEDIA = 4;
+	// TODO Rajia
+	private final int MENU_ITEM_ABOUT = 3;
+	private final int MENU_ITEM_HELP = 4;
+	
 	/* Action Bar */
 	private static int actionBarTapCount = 0;
+	private static boolean useDev = false;
 
-	/* Make sure url is updated when useDev is set. */
-	void setUseDev(boolean useDev) {
-		api.useDev(useDev);
-		if (useDev) {
-			baseDataSetUrl = VIS_URL_DEV;
-		} else {
-			baseDataSetUrl = VIS_URL_PROD;
-		}
-	}
+	/* Start Activity Codes*/
+	private final int QUEUE_UPLOAD_REQUESTED = 1;
+	private final int CHOOSE_SENSORS_REQUESTED = 3;
+	private final int SYNC_TIME_REQUESTED = 4;
+	private final int SETUP_REQUESTED = 5;
+	private final int LOGIN_REQUESTED = 6;
+	
+	private int dataPointCount = 0;
+	private int elapsedSecs;
 
-	@SuppressLint("NewApi")
+	/* Used with Sync Time */
+	private long timeOffset = 0;	
+	
+	/* Used to set time elapsed */
+	private String sec = "";
+	private int min = 0;
+
+	public static JSONArray dataSet;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		saved = savedInstanceState;
+		
+		// Think pointer to this activity
 		mContext = this;
 
-		api = API.getInstance();
-		setUseDev(useDev);
+		// Initialize everything you're going to need
+		initVars();
 
-		if (api.getCurrentUser() != null) {
-			Runnable r = new Runnable() {
-				public void run() {
-					api.deleteSession();
-					api.useDev(useDev);
-				}
-			};
-			new Thread(r).start();
-		}
-
-		// Initialize action bar customization for API >= 11
-		if (android.os.Build.VERSION.SDK_INT >= 11) {
-			ActionBar bar = getActionBar();
-
-			// make the actionbar clickable
-			bar.setDisplayHomeAsUpEnabled(true);
-		}
+		enableAllFields();
 		
-		f = new Fields();
-		uq = new UploadQueue("carrampphysics", mContext, api);
-		uq.buildQueueFromFile();
-
-		w = new Waffle(mContext);
-
-		CredentialManager.login(mContext, api);
-
-		mHandler = new Handler();
-
-		startStop = (Button) findViewById(R.id.startStop);
-
-		values = (TextView) findViewById(R.id.values);
-
-		SharedPreferences prefs = getSharedPreferences("RECORD_LENGTH", 0);
-		length = countdown = prefs.getInt("length", 10);
-
-		if (savedInstanceState == null) {
-			if (firstName.equals("") || lastInitial.equals("")) {
-			
-				Intent iEnterName = new Intent(this, EnterName.class);
-				iEnterName.putExtra(EnterName.PREFERENCES_CLASSROOM_MODE,
-						true);
-				startActivityForResult(iEnterName, RESULT_GOT_NAME);
-				
-			}
-		}
-
-		SharedPreferences prefs2 = getSharedPreferences("PROJID", 0);
-		projectNumber = prefs2.getString("project_id", null);
-		if (projectNumber == null) {
-			projectNumber = DEFAULT_PROJ;
-		}
-
-		if (!Connection.hasConnectivity(mContext)) {
-			projectNumber = "-1";
-		}
-
-		dfm = new DataFieldManager(Integer.parseInt(projectNumber), api,
-				mContext, f);
-		dfm.getOrder();
-
-		new DecimalFormat("#,##0.0");
-
+		// Main Layout Button for Recording Data
 		startStop.setOnLongClickListener(new OnLongClickListener() {
 
+			@SuppressLint("NewApi")
 			@Override
 			public boolean onLongClick(View arg0) {
-				 
-				SharedPreferences prefs = getSharedPreferences("PROJID", 0);
-				projectNumber = prefs.getString("project_id", "-1");
+				if ((!setupDone)) {
+					w.make("You must setup before recording data.",
+							Waffle.LENGTH_LONG, Waffle.IMAGE_WARN);
 
-                if (projectNumber.equals("-1")) {
-                    setUpNoProject();
-                }
+					isRunning = false;
+					return isRunning;
 
-				//if (!projectNumber.equals("-1")) {
+				} else {
+
+					// Vibrate and Beep
+					vibrator.vibrate(300);
 					mMediaPlayer.setLooping(false);
 					mMediaPlayer.start();
-	
-					if (running) {
-	
-						if (timeHasElapsed) {
-	
-							getWindow().clearFlags(
-									WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-	
-							setupDone = false;
-							timeHasElapsed = false;
-							useMenu = true;
-							countdown = length;
-	
-							running = false;
-							startStop.setText("Hold to Start");
-	
-							timeTimer.cancel();
-							choiceViaMenu = false;
-	
-							startStop.setEnabled(true);
-							startStop
-									.setBackgroundResource(R.drawable.button_rsense);
-	
-							/*Intent dataIntent = new Intent(mContext,
-									DataActivity.class);
-							startActivityForResult(dataIntent, UPLOAD_OK_REQUESTED);
-							 */
-							if (len == 0 || len2 == 0) {
-								w.make("There are no data to upload!", Waffle.LENGTH_LONG,
-										Waffle.IMAGE_X);
-								OrientationManager.enableRotation(CarRampPhysicsV2.this);
-							}
-							else{
-								new AddToQueueTask().execute(); 
 
+					
+
+					// Stop the recording and reset UI if running
+					if (isRunning) {
+						isRunning = false;
+						useMenu = true;	
+						if (android.os.Build.VERSION.SDK_INT >= 11)
+							invalidateOptionsMenu();
+
+						// Unregister sensors to save battery
+						mSensorManager.unregisterListener(CarRampPhysicsV2.this);
+
+						// Update the main button
+						enableMainButton(false);
+
+						// Reset main UI
+						time.setText(getResources().getString(
+								R.string.timeElapsed));
+						values.setText(R.string.xyz);
 								
-							}
-						} else if (usedHomeButton) {
-							setupDone = false;
-							timeHasElapsed = false;
-							useMenu = true;
-							countdown = length;
-	
-							running = false;
-							startStop.setText("Hold to Start");
-	
-							timeTimer.cancel();
-							choiceViaMenu = false;
-	
-							startStop.setEnabled(true);
-							startStop
-									.setBackgroundResource(R.drawable.button_rsense);
-	
-						}
-	
+						//enable gravity togglebutton
+						gravity.setEnabled(true);
+						
+						// Cancel the recording timer
+						recordingTimer.cancel();
+						
+						//Add data to Queue to be uploaded
+						new AddToQueueTask().execute(); 
+						
+
+						return isRunning;
+
+						// Start the recording
 					} else {
-	
-						OrientationManager.disableRotation(CarRampPhysicsV2.this);
-						getWindow().addFlags(
-								WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-	
-						startStop.setEnabled(false);
-						startStop
-								.setBackgroundResource(R.drawable.button_rsense_green);
-	
+						srate = Integer.parseInt(rate);
+						
+						
+						//new SensorCheckTask().execute();
+						
+						isRunning = true;
+						useMenu = false;			
+						
+						//disable gravity togglebutton
+						gravity.setEnabled(false);
+						
+						//disable menu
+						if (android.os.Build.VERSION.SDK_INT >= 11)
+							invalidateOptionsMenu();
+
+						// Check to see if a valid project was chosen. If not,
+						// (projectNum is -1) enable all fields for recording.
+						
+						if (projectNum == -1) {
+							enableAllFields();
+						}
+
+						// Create a file so that we can write results to the
+						// sdCard
+						prepWriteToSDCard(new Date());
+
+						//enable sensors needed
+						registerSensors();
+
 						dataSet = new JSONArray();
-						elapsedMillis = 0;
-						len = 0;
-						len2 = 0;
-						i = 0;
-						currentTime = getUploadTime(0);
-	
-						setEnabledFields();
-	
-//						if (saveMode) {
-//							dfm.getOrder();
-//						}
+						elapsedSecs = 0;
+						dataPointCount = 0;
 
 						try {
 							Thread.sleep(100);
 						} catch (InterruptedException e) {
-							w.make("Data recording has offset 100 milliseconds due to an error.",
-									Waffle.LENGTH_SHORT);
+							w.make("Data recording interrupted! Time values may be inconsistent.",
+									Waffle.LENGTH_SHORT, Waffle.IMAGE_X);
 							e.printStackTrace();
 						}
-	
-						useMenu = false;
-	
-						SharedPreferences prefs2 = getSharedPreferences(
-								ACCEL_SETTINGS, 0);
+
 						if (mSensorManager != null) {
-							boolean isLinear = prefs2.getBoolean("LINEAR_ACCEL",
-									false);
-							if (isLinear) {
-								mSensorManager.registerListener(
-										CarRampPhysicsV2.this,
-										mSensorManager
-												.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION),
-										SensorManager.SENSOR_DELAY_FASTEST);
-							} else {
-								mSensorManager.registerListener(
+							if (gravity.isChecked() == true) {
+								mSensorManager
+								.registerListener(
 										CarRampPhysicsV2.this,
 										mSensorManager
 												.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
 										SensorManager.SENSOR_DELAY_FASTEST);
+							} else {
+								mSensorManager
+								.registerListener(
+										CarRampPhysicsV2.this,
+										mSensorManager
+												.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION),
+										SensorManager.SENSOR_DELAY_FASTEST);
 							}
+							
+							mSensorManager
+									.registerListener(
+											CarRampPhysicsV2.this,
+											mSensorManager
+													.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
+											SensorManager.SENSOR_DELAY_FASTEST);
 						}
-	
-						running = true;
-						startStop.setText("" + countdown);
-	
-						timeTimer = new Timer();
-						timeTimer.scheduleAtFixedRate(new TimerTask() {
-	
+
+						dataToBeWrittenToFile = "Accel-X, Accel-Y, Accel-Z, Accel-Total, Mag-X, Mag-Y, Mag-Z, Mag-Total"
+								+ "Latitude, Longitude, Time\n";
+						startStop.setText(getResources().getString(R.string.stopString));
+						startStop.setBackgroundResource(R.drawable.button_rsense_green);						
+						
+						new TimeElapsedTask().execute();
+						
+						initDfm();
+						recordingTimer = new Timer();
+						recordingTimer.scheduleAtFixedRate(new TimerTask() {
 							public void run() {
-	
-								elapsedMillis += INTERVAL;
-	
-								if (i >= (length * (1000 / INTERVAL))) {
-	
-									timeTimer.cancel();
-									timeHasElapsed = true;
-	
-									mHandler.post(new Runnable() {
-										@Override
-										public void run() {
+								if(dataPointCount > DATA_POINT_LIMIT - 2) {
+									CarRampPhysicsV2.this.runOnUiThread(new Runnable(){
+									    public void run(){
 											startStop.performLongClick();
-										}
+									    }
 									});
-	
-								} else {
-	
-									i++;
-									len++;
-									len2++;
-	
-									if (i % (1000 / INTERVAL) == 0) {
-										mHandler.post(new Runnable() {
-											@Override
-											public void run() {
-												startStop.setText("" + countdown);
-											}
-										});
-										countdown--;
-									}
-	
-									f.timeMillis = currentTime + elapsedMillis;
-	
-									if (dfm.getOrderList().contains(
-											mContext.getString(R.string.accel_x))) {
-										f.accel_x = toThou.format(accel[0]);
-									}
-									if (dfm.getOrderList().contains(
-											mContext.getString(R.string.accel_y))) {
-										f.accel_y = toThou.format(accel[1]);
-									}
-									if (dfm.getOrderList().contains(
-											mContext.getString(R.string.accel_z))) {
-										f.accel_z = toThou.format(accel[2]);
-									}
-									if (dfm.getOrderList()
-											.contains(
-													mContext.getString(R.string.accel_total))) {
-										f.accel_total = toThou.format(accel[3]);
-									}
-	
-									dataSet.put(dfm.putData());
-	
 								}
-	
+								recordData();
 							}
-						}, 0, INTERVAL);
-	
+						}, srate, srate);
 					}
-	
-					if (android.os.Build.VERSION.SDK_INT >= 11) {
-						CarRampPhysicsV2.this.invalidateOptionsMenu();
-					}
-	
-					return running;
-				
-	
-//				} else {
-//					w.make("No Project Selected",Waffle.LENGTH_LONG, Waffle.IMAGE_X);
-//					return timeHasElapsed;
-//				}
+					
+					
+					
+					return isRunning;
+				}
+			}
+
+		});
+		
+		gravity.setOnCheckedChangeListener(new OnCheckedChangeListener () {
+
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView,
+					boolean isChecked) {
+				includeGravity = gravity.isChecked();				
 			}
 		});
-
-		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-
-		SharedPreferences prefs3 = getSharedPreferences(ACCEL_SETTINGS, 0);
-		if (mSensorManager != null) {
-			boolean isLinear = prefs3.getBoolean("LINEAR_ACCEL", false);
-			if (CarRampPhysicsV2.getApiLevel() < 14) {
-				// If the device isn't on Jelly Bean
-				ToggleButton button = (ToggleButton) findViewById(R.id.toggleButton1);
-				button.setChecked(isLinear);
-				button.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
-					@Override
-					public void onCheckedChanged(CompoundButton buttonView,
-							boolean isChecked) {
-						changeSensors(buttonView);
-					}
-					
-				});
-				
-				
-			} else {
-				switchGravity = (Switch) findViewById(R.id.switch1);
-				switchGravity.setChecked(isLinear);
-				
-				switchGravity.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
-					@Override
-					public void onCheckedChanged(CompoundButton buttonView,
-							boolean isChecked) {
-						changeSensors(buttonView);						
-					}
-					
-				});
-				
-				
-			}
-			if (isLinear) {
-				mSensorManager
-						.registerListener(
-								CarRampPhysicsV2.this,
-								mSensorManager
-										.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION),
-								SensorManager.SENSOR_DELAY_FASTEST);
-
-			} else {
-				mSensorManager.registerListener(CarRampPhysicsV2.this,
-						mSensorManager
-								.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-						SensorManager.SENSOR_DELAY_FASTEST);
-			}
-			mSensorManager
-					.registerListener(CarRampPhysicsV2.this, mSensorManager
-							.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
-							SensorManager.SENSOR_DELAY_FASTEST);
-		}
-
-		Criteria c = new Criteria();
-		c.setAccuracy(Criteria.ACCURACY_FINE);
-
-		accel = new float[4];
-		mMediaPlayer = MediaPlayer.create(this, R.raw.beep);
 		
-
 	}
+	
 
-	@SuppressLint("NewApi")
-	public void changeSensors(CompoundButton view) {
-		mSensorManager.unregisterListener(CarRampPhysicsV2.this, mSensorManager
-				.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION));
-		mSensorManager.unregisterListener(CarRampPhysicsV2.this,
-				mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER));
+	
+	private void enableMainButton(boolean enable) {
+		if (enable) {
 
-		boolean on;
-
-		if (CarRampPhysicsV2.getApiLevel() < 14) {
-			// If the device isn't on Jelly Bean
-			on = ((ToggleButton) view).isChecked();
 		} else {
-			// the device is on Jelly Bean
-			on = ((Switch) view).isChecked();
+			startStop.setText(getResources().getString(R.string.startString));
+			startStop.setBackgroundResource(R.drawable.button_rsense);
+			startStop.setTextColor(Color.parseColor("#0066FF"));
 		}
-
-		// Determine if normal or linear acceleration
-		if (on) {
-            mSensorManager.registerListener(CarRampPhysicsV2.this,
-                    mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                    SensorManager.SENSOR_DELAY_FASTEST);
-		} else {
-            mSensorManager.registerListener(CarRampPhysicsV2.this,
-                    mSensorManager
-                            .getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION),
-                    SensorManager.SENSOR_DELAY_FASTEST);
-		}
-
-		SharedPreferences prefs = getSharedPreferences(ACCEL_SETTINGS, 0);
-
-		SharedPreferences.Editor editor = prefs.edit();
-		editor.putBoolean("LINEAR_ACCEL", on);
-		editor.commit();
-
 	}
 
-	private void setEnabledFields() {
-		if (dfm.getOrderList().contains(mContext.getString(R.string.accel_x)))
-			dfm.enabledFields[Fields.ACCEL_X] = true;
-		if (dfm.getOrderList().contains(mContext.getString(R.string.accel_y)))
-			dfm.enabledFields[Fields.ACCEL_Y] = true;
-		if (dfm.getOrderList().contains(mContext.getString(R.string.accel_z)))
-			dfm.enabledFields[Fields.ACCEL_Z] = true;
-		if (dfm.getOrderList().contains(
-				mContext.getString(R.string.accel_total)))
-			dfm.enabledFields[Fields.ACCEL_TOTAL] = true;
-		dfm.enabledFields[Fields.TIME] = true;
+	/**
+	 * Returns a nicely formatted date.
+	 * 
+	 * @param date
+	 *            Date you wish to convert
+	 * @return The date in string form: MM/dd/yyyy, HH:mm:ss
+	 */
+	String getNiceDateString(Date date) {
+
+		SimpleDateFormat niceFormat = new SimpleDateFormat(
+				"MM/dd/yyyy, HH:mm:ss", Locale.US);
+
+		return niceFormat.format(date);
 	}
 
-	long getUploadTime(int millisecond) {
+	/**
+	 * Prepares a file for writing date to the sdCard.
+	 * 
+	 * @param date
+	 *            Time stamp for the file name
+	 * @return Newly created file on sdCard
+	 */
+	private File prepWriteToSDCard(Date date) {
+		SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy--HH-mm-ss",
+				Locale.US);
 
-		Calendar c = Calendar.getInstance();
+		String dateString = sdf.format(date);
 
-		return (long) (c.getTimeInMillis());
+		File folder = new File(Environment.getExternalStorageDirectory()
+				+ "/iSENSE");
+
+		if (!folder.exists()) {
+			folder.mkdir();
+		}
+		
+		String sdFileName = rideNameString + "-" + stNumber + "-"
+				+ dateString + ".csv";
+		File sdFile = new File(folder, sdFileName);
+
+		return sdFile;
 
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		if (timeTimer != null)
-			timeTimer.cancel();
-		inPausedState = true;
 
-	}
-
-	@Override
-	public void onStop() {
-		super.onStop();
-		if (timeTimer != null)
-			timeTimer.cancel();
-		inPausedState = true;
-		mSensorManager.unregisterListener(CarRampPhysicsV2.this, mSensorManager
-				.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION));
-
-	}
-
-	public void onUserLeaveHint() {
-		super.onUserLeaveHint();
-		usedHomeButton = true;
-	}
-
-	@Override
-	public void onStart() {
-		super.onStart();
-		inPausedState = false;
-		SharedPreferences prefs3 = getSharedPreferences(ACCEL_SETTINGS, 0);
-		boolean isLinear = prefs3.getBoolean("LINEAR_ACCEL", false);
-		if (isLinear) {
-			mSensorManager.registerListener(CarRampPhysicsV2.this,
-					mSensorManager
-							.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION),
-					SensorManager.SENSOR_DELAY_FASTEST);
-		} else {
-			mSensorManager.registerListener(CarRampPhysicsV2.this,
-					mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-					SensorManager.SENSOR_DELAY_FASTEST);
+		// Stop the current sensors to save battery.
+		mLocationManager.removeUpdates(CarRampPhysicsV2.this);
+		mSensorManager.unregisterListener(CarRampPhysicsV2.this);
+		
+		//Stop recording
+		if (isRunning) {
+			startStop.performLongClick();
 		}
+
+
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		inPausedState = false;
-		getSharedPreferences(RECORD_SETTINGS, 0);
 
-		if (usedHomeButton && running) {
-			setupDone = false;
-			timeHasElapsed = false;
-			useMenu = true;
-			countdown = length;
+		// Silently logs in the user to iSENSE
+		CredentialManager.login(mContext, api);
 
-			running = false;
-			startStop.setText("Hold to Start");
-			startStop.setEnabled(true);
-			startStop.setBackgroundResource(R.drawable.button_rsense);
-
-			timeTimer.cancel();
-			choiceViaMenu = false;
-			startStop.setEnabled(true);
-			dataSet = new JSONArray();
-			OrientationManager.enableRotation(CarRampPhysicsV2.this);
-
-			menu.setGroupVisible(0, true);
-			useMenu = true;
-
-			w.make("Data recording halted.", Waffle.LENGTH_SHORT,
-					Waffle.IMAGE_X);
-		}
-
+		// Rebuilds the upload queue
 		if (uq != null)
 			uq.buildQueueFromFile();
+		
+		
+		initLocManager();
+	}
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
 
-		SharedPreferences prefs2 = getSharedPreferences("PROJID", 0);
-		projectNumber = prefs2.getString("project_id", null);
-		if (projectNumber == null) {
-				projectNumber = DEFAULT_PROJ;
-		}
+		initLocManager();
 
-		if (!Connection.hasConnectivity(mContext)) {
-			projectNumber = "-1";
-		}
-
-		dfm = new DataFieldManager(Integer.parseInt(projectNumber), api,
-				mContext, f);
-		dfm.getOrder();
-
-		new DecimalFormat("#,##0.0");
-
-		if (dfm.getOrderList().contains(mContext.getString(R.string.accel_x))) {
-			values.setText("X: ");
-		}
-
-		if (dfm.getOrderList().contains(mContext.getString(R.string.accel_y))) {
-			if (dfm.getOrderList().contains(
-					mContext.getString(R.string.accel_x))) {
-				values.setText(values.getText() + " Y: ");
-			} else {
-				values.setText("Y: ");
-			}
-		}
-
-		if (dfm.getOrderList().contains(mContext.getString(R.string.accel_z))) {
-			if (dfm.getOrderList().contains(
-					mContext.getString(R.string.accel_x))
-					|| dfm.getOrderList().contains(
-							mContext.getString(R.string.accel_y))) {
-				values.setText(values.getText() + " Z: ");
-			} else {
-				values.setText("Z: ");
-			}
-
-		}
-
-		if (dfm.getOrderList().contains(
-				mContext.getString(R.string.accel_total))) {
-
-			if (dfm.getOrderList().contains(
-					mContext.getString(R.string.accel_x))
-					|| dfm.getOrderList().contains(
-							mContext.getString(R.string.accel_y))
-					|| dfm.getOrderList().contains(
-							mContext.getString(R.string.accel_z))) {
-				values.setText(values.getText() + " Magnitude: ");
-			} else {
-				values.setText("Magnitude: ");
-			}
-
-		}
 	}
 
 	@Override
-	public void onBackPressed() {
-		super.onBackPressed();
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.main, menu);
+	public boolean onCreateOptionsMenu (Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.menu, menu);
 		return true;
 	}
+	
 
+	
+	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		menu.setGroupEnabled(0, useMenu);
 		return true;
 	}
 
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.login:
-			startActivityForResult(new Intent(this, CredentialManager.class),
-					LOGIN_STATUS_REQUESTED);
+		case R.id.MENU_ITEM_SETUP:
+			Intent iSetup = new Intent(CarRampPhysicsV2.this, Configuration.class);
+			startActivityForResult(iSetup, SETUP_REQUESTED);
 			return true;
-		case R.id.project_select:
-			Intent setup = new Intent(this, Setup.class);
-			setup.putExtra("constrictFields", true);
-			setup.putExtra("app_name", "CRP");
-			startActivityForResult(setup, PROJECT_REQUESTED);
-			return true;
-		case R.id.upload:
+		//*************Rajia ******************	
+		case R.id.MENU_ITEM_UPLOAD:
 			manageUploadQueue();
 			return true;
-		case R.id.record_length:
-			createSingleInputDialog("Change Recording Length", "",
-					RECORDING_LENGTH_REQUESTED);
-			return true;
-		case R.id.changename:
-			Intent iEnterName = new Intent(mContext, EnterName.class);
-			SharedPreferences classPrefs = getSharedPreferences(
-					ClassroomMode.PREFS_KEY_CLASSROOM_MODE, 0);
-			iEnterName.putExtra(EnterName.PREFERENCES_CLASSROOM_MODE,
-					classPrefs.getBoolean(
-							ClassroomMode.PREFS_BOOLEAN_CLASSROOM_MODE, true));
-			startActivityForResult(iEnterName, RESULT_GOT_NAME);
-			return true;
-		case R.id.reset:
-			startActivityForResult(new Intent(this, ResetToDefaults.class),
-					RESET_REQUESTED);
-			return true;
-		case R.id.about_app:
+		case R.id.MENU_ITEM_ABOUT:
+			// Shows the about dialog
 			startActivity(new Intent(this, About.class));
 			return true;
-		case R.id.helpMenuItem:
+			
+		case R.id.MENU_ITEM_HELP:
+			// Shows the about dialog
 			startActivity(new Intent(this, Help.class));
 			return true;
+		//***************************************	
+			
+		case R.id.MENU_ITEM_LOGIN:
+			startActivityForResult(new Intent(getApplicationContext(),
+					CredentialManager.class), LOGIN_REQUESTED);
+			return true;
+		
+//		case R.id.MENU_ITEM_TIME:
+//			startActivityForResult(new Intent(getApplicationContext(),
+//					SyncTime.class), SYNC_TIME_REQUESTED);
+//			return true;
+//		case R.id.MENU_ITEM_MEDIA:
+//			if ((!setupDone)) {
+//				w.make("You must setup before using Media Manager.",
+//						Waffle.LENGTH_LONG, Waffle.IMAGE_WARN);
+//			} else {
+//				Intent iMedia = new Intent(AmusementPark.this, MediaManager.class);
+//				startActivity(iMedia);
+//			}
+//			return true;
 		case android.R.id.home:
 			CountDownTimer cdt = null;
 
@@ -804,84 +537,105 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 				w.make(getResources().getString(R.string.now_in_mode) + other
 						+ getResources().getString(R.string.mode_type));
 				useDev = !useDev;
+				
+				api.useDev(useDev);
 
 				if (cdt != null)
 					cdt.cancel();
 
-				if (api.getCurrentUser() != null) {
-					Runnable r = new Runnable() {
-						public void run() {
-							api.deleteSession();
-							api.useDev(useDev);
-						}
-					};
-					new Thread(r).start();
-				} else
-					setUseDev(useDev);
-
+				CredentialManager.login(this, api);
 				actionBarTapCount = 0;
+				
+				
+				
 				break;
 			}
 
 			return true;
+		
+		default:
+			return false;
 		}
-
-		return false;
+	}
+	
+	
+	
+	@Override
+	public void onAccuracyChanged(Sensor arg0, int arg1) {
 	}
 
+	/**
+	 * Stores some data into our global objects as quickly as we get new points.
+	 */
 	@Override
 	public void onSensorChanged(SensorEvent event) {
+		DecimalFormat toThou = new DecimalFormat("######0.000");
+		//DecimalFormat threeDigit = new DecimalFormat("#,##0.000");
+		DecimalFormat oneDigit = new DecimalFormat("#,#00.0");
 
-		DecimalFormat oneDigit = new DecimalFormat("#,##0.0");
+		if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION ||
+				event.sensor.getType() == Sensor.TYPE_ACCELEROMETER ) {
+			
+			if (dfm.enabledFields[Fields.ACCEL_X]
+					|| dfm.enabledFields[Fields.ACCEL_Y]
+					|| dfm.enabledFields[Fields.ACCEL_Z]
+					|| dfm.enabledFields[Fields.ACCEL_TOTAL]) {
 
-		if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION
-				|| event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+				rawAccel = event.values.clone();
+				accel[0] = event.values[0];
+				accel[1] = event.values[1];
+				accel[2] = event.values[2];
 
-			accel[0] = event.values[0];
-			accel[1] = event.values[1];
-			accel[2] = event.values[2];
-			accel[3] = (float) Math.sqrt(Math.pow(accel[0], 2)
-					+ Math.pow(accel[1], 2) + Math.pow(accel[2], 2));
-			String xPrepend, yPrepend, zPrepend, data = "";
+				String xPrepend = accel[0] > 0 ? "+" : "";
+				String yPrepend = accel[1] > 0 ? "+" : "";
+				String zPrepend = accel[2] > 0 ? "+" : "";
 
-			xPrepend = accel[0] > 0 ? "+" : "";
-			yPrepend = accel[1] > 0 ? "+" : "";
-			zPrepend = accel[2] > 0 ? "+" : "";
-
-			if (dfm.getOrderList().contains(
-					mContext.getString(R.string.accel_x))) {
-				data = "X: " + xPrepend + oneDigit.format(accel[0]);
-			}
-			if (dfm.getOrderList().contains(
-					mContext.getString(R.string.accel_y))) {
-				if (!data.equals("")) {
-					data += " , Y: " + yPrepend + oneDigit.format(accel[1]);
-				} else {
-					data += "Y: " + yPrepend + oneDigit.format(accel[1]);
-				}
-			}
-			if (dfm.getOrderList().contains(
-					mContext.getString(R.string.accel_z))) {
-				if (!data.equals("")) {
-					data += " , Z: " + zPrepend + oneDigit.format(accel[2]);
-				} else {
-					data += "Z: " + zPrepend + oneDigit.format(accel[2]);
-				}
-			}
-
-			if (dfm.getOrderList().contains(
-					mContext.getString(R.string.accel_total))) {
-
-				if (!data.equals("")) {
-					data += " , Magnitude: " + oneDigit.format(accel[3]);
-				} else {
-					data += "Magnitude: " + oneDigit.format(accel[3]);
+				if (isRunning) {
+					values.setText("Ax: " + xPrepend
+							+ oneDigit.format(accel[0]) + " " + "m/s^2" + "\nAy: " + yPrepend
+							+ oneDigit.format(accel[1]) + " " + "m/s^2" + "\nAz: " + zPrepend
+							+ oneDigit.format(accel[2]) + " " + "m/s^2");
 				}
 
+				accel[3] = (float) Math.sqrt((float) ((Math.pow(accel[0], 2)
+						+ Math.pow(accel[1], 2) + Math.pow(accel[2], 2))));
+
 			}
 
-			values.setText(data);
+		} else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+			if (dfm.enabledFields[Fields.MAG_X]
+					|| dfm.enabledFields[Fields.MAG_Y]
+					|| dfm.enabledFields[Fields.MAG_Z]
+					|| dfm.enabledFields[Fields.MAG_TOTAL]
+					|| dfm.enabledFields[Fields.HEADING_DEG]
+					|| dfm.enabledFields[Fields.HEADING_RAD]) {
 
+				rawMag = event.values.clone();
+
+				mag[0] = event.values[0];
+				mag[1] = event.values[1];
+				mag[2] = event.values[2];
+
+				float rotation[] = new float[9];
+
+				if (SensorManager.getRotationMatrix(rotation, null, rawAccel,
+						rawMag)) {
+					orientation = new float[3];
+					SensorManager.getOrientation(rotation, orientation);
+				}
+			}
+
+		} else if (event.sensor.getType() == Sensor.TYPE_AMBIENT_TEMPERATURE) {
+			if (dfm.enabledFields[Fields.TEMPERATURE_C]
+					|| dfm.enabledFields[Fields.TEMPERATURE_F]
+					|| dfm.enabledFields[Fields.TEMPERATURE_K])
+				temperature = toThou.format(event.values[0]);
+		} else if (event.sensor.getType() == Sensor.TYPE_PRESSURE) {
+			if (dfm.enabledFields[Fields.PRESSURE])
+				pressure = toThou.format(event.values[0]);
+		} else if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
+			if (dfm.enabledFields[Fields.LIGHT])
+				light = toThou.format(event.values[0]);
 		}
 	}
 
@@ -890,485 +644,90 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 		loc = location;
 	}
 
-	public static int getApiLevel() {
-		return android.os.Build.VERSION.SDK_INT;
+	@Override
+	public void onProviderDisabled(String provider) {
 	}
 
 	@Override
-	public void onActivityResult(int reqCode, int resultCode, Intent data) {
-		super.onActivityResult(reqCode, resultCode, data);
-		dontPromptMeTwice = false;
-
-		if (reqCode == PROJECT_REQUESTED) {
-			if (resultCode == RESULT_OK) {
-				SharedPreferences prefs = getSharedPreferences("PROJID", 0);
-				projectNumber = prefs.getString("project_id", null);
-				if (projectNumber == null) {
-					projectNumber = DEFAULT_PROJ;
-				}
-				dfm = new DataFieldManager(Integer.parseInt(projectNumber),
-						api, mContext, f);
-				dfm.getOrder();
-
-				DecimalFormat oneDigit = new DecimalFormat("#,##0.0");
-				if (dfm.getOrderList().contains(
-						mContext.getString(R.string.accel_x))) {
-					values.setText("X: " + oneDigit.format(accel[0]));
-				}
-				if (dfm.getOrderList().contains(
-						mContext.getString(R.string.accel_y))) {
-					if (dfm.getOrderList().contains(
-							mContext.getString(R.string.accel_x))) {
-						values.setText(values.getText() + " Y: "
-								+ oneDigit.format(accel[1]));
-					} else {
-						values.setText("Y: " + oneDigit.format(accel[1]));
-					}
-				}
-				if (dfm.getOrderList().contains(
-						mContext.getString(R.string.accel_z))) {
-					if (dfm.getOrderList().contains(
-							mContext.getString(R.string.accel_x))
-							|| dfm.getOrderList().contains(
-									mContext.getString(R.string.accel_y))) {
-						values.setText(values.getText() + " Z: "
-								+ oneDigit.format(accel[2]));
-					} else {
-						values.setText("Z: " + oneDigit.format(accel[2]));
-					}
-
-				}
-				if (dfm.getOrderList().contains(
-						mContext.getString(R.string.accel_total))) {
-					accel[3] = (float) Math.sqrt(Math.pow(accel[0], 2)
-							+ Math.pow(accel[1], 2) + Math.pow(accel[2], 2));
-
-					if (dfm.getOrderList().contains(
-							mContext.getString(R.string.accel_x))
-							|| dfm.getOrderList().contains(
-									mContext.getString(R.string.accel_y))
-							|| dfm.getOrderList().contains(
-									mContext.getString(R.string.accel_z))) {
-						values.setText(values.getText() + " Magnitude: "
-								+ oneDigit.format(accel[3]));
-					} else {
-						values.setText("Magnitude: "
-								+ oneDigit.format(accel[3]));
-					}
-
-				}
-			}
-
-		} else if (reqCode == QUEUE_UPLOAD_REQUESTED) {
-			uq.buildQueueFromFile();
-
-		} /*else if (reqCode == UPLOAD_OK_REQUESTED) {
-				if (len == 0 || len2 == 0) {
-					w.make("There are no data to upload!", Waffle.LENGTH_LONG,
-							Waffle.IMAGE_X);
-					OrientationManager.enableRotation(CarRampPhysicsV2.this);
-				}
-
-				else
-					new UploadTask().execute();
-			 
-		}*/ else if (reqCode == LOGIN_STATUS_REQUESTED) {
-			if (resultCode == RESULT_OK) {
-
-			}
-
-			dfm = new DataFieldManager(Integer.parseInt(projectNumber), api,
-					mContext, f);
-			dfm.getOrder();
-			DecimalFormat oneDigit = new DecimalFormat("#,##0.0");
-			if (dfm.getOrderList().contains(
-					mContext.getString(R.string.accel_x))) {
-				values.setText("X: " + oneDigit.format(accel[0]));
-			}
-			if (dfm.getOrderList().contains(
-					mContext.getString(R.string.accel_y))) {
-				if (dfm.getOrderList().contains(
-						mContext.getString(R.string.accel_x))) {
-					values.setText(values.getText() + " Y: "
-							+ oneDigit.format(accel[1]));
-				} else {
-					values.setText("Y: " + oneDigit.format(accel[1]));
-				}
-			}
-			if (dfm.getOrderList().contains(
-					mContext.getString(R.string.accel_z))) {
-				if (dfm.getOrderList().contains(
-						mContext.getString(R.string.accel_x))
-						|| dfm.getOrderList().contains(
-								mContext.getString(R.string.accel_y))) {
-					values.setText(values.getText() + " Z: "
-							+ oneDigit.format(accel[2]));
-				} else {
-					values.setText("Z: " + oneDigit.format(accel[2]));
-				}
-
-			}
-			if (dfm.getOrderList().contains(
-					mContext.getString(R.string.accel_total))) {
-				accel[3] = (float) Math.sqrt(Math.pow(accel[0], 2)
-						+ Math.pow(accel[1], 2) + Math.pow(accel[2], 2));
-
-				if (dfm.getOrderList().contains(
-						mContext.getString(R.string.accel_x))
-						|| dfm.getOrderList().contains(
-								mContext.getString(R.string.accel_y))
-						|| dfm.getOrderList().contains(
-								mContext.getString(R.string.accel_z))) {
-					values.setText(values.getText() + " Magnitude: "
-							+ oneDigit.format(accel[3]));
-				} else {
-					values.setText("Magnitude: " + oneDigit.format(accel[3]));
-				}
-
-			}
-
-		} else if (reqCode == RECORDING_LENGTH_REQUESTED) {
-			if (resultCode == RESULT_OK) {
-				length = Integer.parseInt(data.getStringExtra("input"));
-				countdown = length;
-				SharedPreferences prefs = getSharedPreferences("RECORD_LENGTH",
-						0);
-				SharedPreferences.Editor editor = prefs.edit();
-				editor.putInt("length", length);
-				// Below is a math fail
-				// if (length <= 25) {
-				// INTERVAL = 50;
-				// } else {
-				// INTERVAL = 2 * length;
-				// }
-				editor.putInt("Interval", INTERVAL);
-				editor.commit();
-			}
-		} else if (reqCode == RESULT_GOT_NAME) {
-			if (resultCode == RESULT_OK) {
-				SharedPreferences namePrefs = getSharedPreferences(
-						EnterName.PREFERENCES_KEY_USER_INFO, MODE_PRIVATE);
-
-				if (namePrefs
-						.getBoolean(
-								EnterName.PREFERENCES_USER_INFO_SUBKEY_USE_ACCOUNT_NAME,
-								true)) {
-					RPerson user = api.getCurrentUser();
-
-					firstName = user.name;
-					lastInitial = "";
-
-
-				} else {
-					firstName = namePrefs.getString(
-							EnterName.PREFERENCES_USER_INFO_SUBKEY_FIRST_NAME,
-							"");
-					lastInitial = namePrefs
-							.getString(
-									EnterName.PREFERENCES_USER_INFO_SUBKEY_LAST_INITIAL,
-									"");
-
-					
-				}
-
-			}
-		} else if (reqCode == RESET_REQUESTED) {
-			if (resultCode == RESULT_OK) {
-				SharedPreferences prefs = getSharedPreferences("RECORD_LENGTH",
-						0);
-				countdown = length = prefs.getInt("length", 10);
-
-				CredentialManager.login(this, api);
-
-				SharedPreferences eprefs = getSharedPreferences("PROJID", 0);
-				SharedPreferences.Editor editor = eprefs.edit();
-				projectNumber = DEFAULT_PROJ;
-				editor.putString("project_id", projectNumber);
-				editor.commit();
-				INTERVAL = 50;
-
-				dfm = new DataFieldManager(Integer.parseInt(projectNumber),
-						api, mContext, f);
-				dfm.getOrder();
-
-				DecimalFormat oneDigit = new DecimalFormat("#,##0.0");
-				if (dfm.getOrderList().contains(
-						mContext.getString(R.string.accel_x))) {
-					values.setText("X: " + oneDigit.format(accel[0]));
-				}
-				if (dfm.getOrderList().contains(
-						mContext.getString(R.string.accel_y))) {
-					if (dfm.getOrderList().contains(
-							mContext.getString(R.string.accel_x))) {
-						values.setText(values.getText() + " Y: "
-								+ oneDigit.format(accel[1]));
-					} else {
-						values.setText("Y: " + oneDigit.format(accel[1]));
-					}
-				}
-				if (dfm.getOrderList().contains(
-						mContext.getString(R.string.accel_z))) {
-					if (dfm.getOrderList().contains(
-							mContext.getString(R.string.accel_x))
-							|| dfm.getOrderList().contains(
-									mContext.getString(R.string.accel_y))) {
-						values.setText(values.getText() + " Z: "
-								+ oneDigit.format(accel[2]));
-					} else {
-						values.setText("Z: " + oneDigit.format(accel[2]));
-					}
-
-				}
-				if (dfm.getOrderList().contains(
-						mContext.getString(R.string.accel_total))) {
-					accel[3] = (float) Math.sqrt(Math.pow(accel[0], 2)
-							+ Math.pow(accel[1], 2) + Math.pow(accel[2], 2));
-
-					if (dfm.getOrderList().contains(
-							mContext.getString(R.string.accel_x))
-							|| dfm.getOrderList().contains(
-									mContext.getString(R.string.accel_y))
-							|| dfm.getOrderList().contains(
-									mContext.getString(R.string.accel_z))) {
-						values.setText(values.getText() + " Magnitude: "
-								+ oneDigit.format(accel[3]));
-					} else {
-						values.setText("Magnitude: "
-								+ oneDigit.format(accel[3]));
-					}
-
-				}
-				
-				Intent iEnterName = new Intent(mContext, EnterName.class);
-				SharedPreferences classPrefs = getSharedPreferences(
-						ClassroomMode.PREFS_KEY_CLASSROOM_MODE, 0);
-				iEnterName.putExtra(EnterName.PREFERENCES_CLASSROOM_MODE,
-						classPrefs.getBoolean(
-								ClassroomMode.PREFS_BOOLEAN_CLASSROOM_MODE, true));
-				startActivityForResult(iEnterName, RESULT_GOT_NAME);
-
-			}
-		} else if (reqCode == FIELD_MATCHING_REQUESTED) {
-            if (resultCode == RESULT_OK) {
-                if (FieldMatching.acceptedFields.isEmpty()) {
-                    Intent iProj = new Intent(mContext, Setup.class);
-                    iProj.putExtra("from_where", "main");
-                    startActivityForResult(iProj, ALTER_DATA_PROJ_REQUESTED);
-                } else if (!FieldMatching.compatible) {
-                    Intent iProj = new Intent(mContext, Setup.class);
-                    iProj.putExtra("from_where", "main");
-                    startActivityForResult(iProj, ALTER_DATA_PROJ_REQUESTED);
-                }
-            } else if (resultCode == RESULT_CANCELED) {
-                Intent iProj = new Intent(mContext, Setup.class);
-                iProj.putExtra("from_where", "main");
-                startActivityForResult(iProj, ALTER_DATA_PROJ_REQUESTED);
-            }
-//		} else if (reqCode == SAVE_MODE_REQUESTED) {
-//			if (resultCode == RESULT_OK) {
-//				saveMode = true;
-//
-//				CarRampPhysicsV2.projectNumber = "-1";
-//				dfm = new DataFieldManager(Integer.parseInt(projectNumber),
-//						api, mContext, f);
-//				dfm.getOrder();
-//				DecimalFormat oneDigit = new DecimalFormat("#,##0.0");
-//				if (dfm.getOrderList().contains(
-//						mContext.getString(R.string.accel_x))) {
-//					values.setText("X: " + oneDigit.format(accel[0]));
-//				}
-//				if (dfm.getOrderList().contains(
-//						mContext.getString(R.string.accel_y))) {
-//					if (dfm.getOrderList().contains(
-//							mContext.getString(R.string.accel_x))) {
-//						values.setText(values.getText() + " Y: "
-//								+ oneDigit.format(accel[1]));
-//					} else {
-//						values.setText("Y: " + oneDigit.format(accel[1]));
-//					}
-//				}
-//				if (dfm.getOrderList().contains(
-//						mContext.getString(R.string.accel_z))) {
-//					if (dfm.getOrderList().contains(
-//							mContext.getString(R.string.accel_x))
-//							|| dfm.getOrderList().contains(
-//									mContext.getString(R.string.accel_y))) {
-//						values.setText(values.getText() + " Z: "
-//								+ oneDigit.format(accel[2]));
-//					} else {
-//						values.setText("Z: " + oneDigit.format(accel[2]));
-//					}
-//
-//				}
-//				if (dfm.getOrderList().contains(
-//						mContext.getString(R.string.accel_total))) {
-//					accel[3] = (float) Math.sqrt(Math.pow(accel[0], 2)
-//							+ Math.pow(accel[1], 2) + Math.pow(accel[2], 2));
-//
-//					if (dfm.getOrderList().contains(
-//							mContext.getString(R.string.accel_x))
-//							|| dfm.getOrderList().contains(
-//									mContext.getString(R.string.accel_y))
-//							|| dfm.getOrderList().contains(
-//									mContext.getString(R.string.accel_z))) {
-//						values.setText(values.getText() + " Magnitude: "
-//								+ oneDigit.format(accel[3]));
-//					} else {
-//						values.setText("Magnitude: "
-//								+ oneDigit.format(accel[3]));
-//					}
-//
-//				}
-//			} else {
-//				if (!Connection.hasConnectivity(mContext)) {
-//					startActivityForResult(new Intent(mContext,
-//							SaveModeDialog.class), SAVE_MODE_REQUESTED);
-//				} else {
-//					saveMode = false;
-//				}
-//			}
-        }
+	public void onProviderEnabled(String provider) {
 	}
 
+	@Override
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+	}
+
+	// Performs tasks after returning to main UI from previous activities
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+		if (requestCode == SYNC_TIME_REQUESTED) {
+			if (resultCode == RESULT_OK) {
+				timeOffset = data.getExtras().getLong("offset");
+				SharedPreferences mPrefs = getSharedPreferences(
+						TIME_OFFSET_PREFS_ID, 0);
+				SharedPreferences.Editor mEditor = mPrefs.edit();
+				mEditor.putLong(TIME_OFFSET_KEY, timeOffset);
+				mEditor.commit();
+			}
+		} else if (requestCode == QUEUE_UPLOAD_REQUESTED) {
+			boolean success = uq.buildQueueFromFile();
+			if (!success) {
+				w.make("Could not re-build queue from file!", Waffle.IMAGE_X);
+			}
+		} else if (requestCode == CHOOSE_SENSORS_REQUESTED) {
+			startStop.setEnabled(true);
+			dfm.setEnabledFields(acceptedFields);
+			
+		} else if (requestCode == SETUP_REQUESTED) {
+				rideName.setText("Ride: " + rideNameString);
+				
+				SharedPreferences mPrefs = getSharedPreferences(
+						Setup.PROJ_PREFS_ID, 0);
+				final SharedPreferences.Editor mEdit = mPrefs.edit();
+				mEdit.putString(Setup.PROJECT_ID, Integer.toString(projectNum));
+				mEdit.commit();
+				
+				
+		} else if (requestCode == LOGIN_REQUESTED) {
+			
+			
+		}
+
+	}
+
+	// Assists with differentiating between displays for dialogues
+	private int getApiLevel() {
+		return android.os.Build.VERSION.SDK_INT;
+	}
+
+	// Calls the api primitives for actual uploading
 	private Runnable uploader = new Runnable() {
 
-		@SuppressLint("NewApi")
 		@Override
 		public void run() {
 
-			int dataSetID = -1;
+			// Create name from time stamp
+			String name = dataName;
+
+			// Retrieve project id
+			SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
+			String projId = mPrefs.getString(Setup.PROJECT_ID, "");
 			
-			String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-
-
-			nameOfDataSet = firstName + " " + lastInitial;
-		
-			uploadSuccessful = false;
-			QDataSet ds = new QDataSet(nameOfDataSet + " Gravity: " + ((switchGravity.isChecked()) ? "Included" : "Not Included"),
-                    currentDateTimeString,
-					QDataSet.Type.DATA, dataSet.toString(), null,
-					projectNumber, null);
-
-			CarRampPhysicsV2.uq.addDataSetToQueue(ds);
-				
-			return;
-
+			Log.e("DATASET", dataSet.toString());
+			
+			Date date = new Date();
+			
+			// Saves data to queue for later upload
+			QDataSet ds = new QDataSet(name + " Ride: " + rideNameString + " Gravity: " + ((includeGravity) ? "Included" : "Not Included"), "Time: " + getNiceDateString(date) 
+					+ "\n" + "Number of Data Points: " + dataPointCount, QDataSet.Type.DATA,
+					dataSet.toString(), null, projId, null);
+			
+			uq.addDataSetToQueue(ds);
 		}
 
 	};
-	public boolean uploadSuccessful;
 
-	/**
-	 * Upload function specifically for when projID = -1 initially.
-	 * 
-	 * In this scenario, you'll need to provide an
-	 * {@link edu.uml.cs.isense.comm.API API} instance along with an activity
-	 * context.
-	 * 
-	 * @param api
-	 *            - An instance of API
-	 * @param c
-	 *            - The context of the calling activity
-	 * 
-	 * @return The ID of the data set created on iSENSE, or -1 if the upload
-	 *         failed
-	 */
-	public static int upload(API api, Context c) {
-		if (CarRampPhysicsV2.projectNumber.equals("-1"))
-			return -1;
-
-		return upload(DataFieldManager.reOrderData(dataSet,
-				CarRampPhysicsV2.projectNumber, mContext, null, null));
-	}
-
-	/**
-	 * Attempts to upload data with the given information passed in through the
-	 * QDataSet constructor
-	 * 
-	 * @return The ID of the data set created on iSENSE, or -1 if the upload
-	 *         failed
-	 */
-	public static int upload(String obj) {
-
-		int dataSetID = -1;
-
-		try {
-			JSONArray dataJSON = new JSONArray(obj);
-			if (!(dataJSON.isNull(0))) {
-
-				dataToUpload = new JSONObject();
-				try {
-					dataToUpload.put("data", dataJSON);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-				dataToUpload = UploadQueue.getAPI().rowsToCols(dataToUpload);
-
-				System.out.println("JOBJ: " + dataToUpload.toString());
-
-				dataSetID = UploadQueue.getAPI().uploadDataSet(
-						Integer.parseInt(projectNumber), dataToUpload, nameOfDataSet);
-				System.out.println("Data set ID from Upload is: " + dataSetID);
-
-			}
-		} catch (JSONException e) {
-
-		}
-
-		return dataSetID;
-	}
-
-	public class UploadTask extends AsyncTask<Void, Integer, Void> {
-
-		@Override
-		protected void onPreExecute() {
-
-			dia = new ProgressDialog(mContext);
-			dia.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-			dia.setCancelable(false);
-			dia.show();
-
-		}
-
-		@Override
-		protected Void doInBackground(Void... voids) {
-
-			uploader.run();
-			publishProgress(100);
-			return null;
-
-		}
-
-		@Override
-		protected void onPostExecute(Void voids) {
-
-			dia.setMessage("Done");
-			if (dia != null && dia.isShowing())
-				dia.dismiss();
-
-			len = 0;
-			len2 = 0;
-
-			if (uploadSuccessful) {
-				w.make("Data upload successful.", Waffle.LENGTH_SHORT,
-						Waffle.IMAGE_CHECK);
-			} else {
-				if (api.getCurrentUser() != null) {
-					w.make("Data saved.", Waffle.LENGTH_LONG, Waffle.IMAGE_CHECK);
-				} else {
-					Intent i = new Intent(mContext, ContributorKeyDialog.class);
-					i.putExtra("ID", Integer.parseInt(CarRampPhysicsV2.projectNumber));
-					i.putExtra("data", CarRampPhysicsV2.dataToUpload.toString());
-					i.putExtra("name", nameOfDataSet);
-					startActivity(i);
-				}
-			}
-
-			OrientationManager.enableRotation(CarRampPhysicsV2.this);
-
-		}
-	}
-	
 	/**
 	 * Uploads data to iSENSE or something.
 	 * 
@@ -1407,117 +766,489 @@ public class CarRampPhysicsV2 extends Activity implements SensorEventListener,
 			
 
 			Date date = new Date();
+			showSummary(date, sdFileName);
 
 		}
 	}
 
+	/**
+	 * Writes the passed in time to the main screen.
+	 * 
+	 * @param seconds
+	 */ 
+	public void setTime(int seconds) {
+		elapsedSecs = seconds;
+		
+		min = seconds / 60;
+		int secInt = seconds % 60;
 
+		sec = "";
+		if (secInt <= 9)
+			sec = "0" + secInt;
+		else
+			sec = "" + secInt;
+		
 
+		runOnUiThread(new Runnable() {
+		    public void run() {
+		    	time.setText("Time Elapsed: " + min + ":" + sec);
+		    }
+		});
+
+	}
+	
+	private class TimeElapsedTask extends AsyncTask<Void, Integer, Void> {
+		@Override
+		protected void onPreExecute() {
+		}
+
+		@Override
+		protected Void doInBackground(Void... voids) {
+			for(int time = 0; isRunning; time++ ) {
+				setTime(time);
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void voids) {
+			
+		}
+	}
+	
+	
+	
+
+	/**
+	 * Everything needed to be initialized for onCreate in one helpful function.
+	 */
+	@SuppressLint("NewApi")
+	private void initVars() {
+
+		api = API.getInstance();
+		api.useDev(useDev);
+		
+		// Initialize action bar customization for API >= 11
+				if (android.os.Build.VERSION.SDK_INT >= 11) {
+					ActionBar bar = getActionBar();
+
+					// make the actionbar clickable
+					bar.setDisplayHomeAsUpEnabled(true);
+				}
+
+		// Login to iSENSE
+		CredentialManager.login(this, api);
+
+		// Create a new upload queue
+		uq = new UploadQueue(ACTIVITY_NAME, mContext, api);
+		
+		// OMG a button!
+		startStop = (Button) findViewById(R.id.startStop);
+		
+		//Toggle button for gravity
+		gravity = (ToggleButton) findViewById(R.id.tbGravity);
+		gravity.setChecked(includeGravity);
+		
+		// Have some TVs. TextViews I mean.
+		values = (TextView) findViewById(R.id.values);
+		time = (TextView) findViewById(R.id.time);
+		rideName = (TextView) findViewById(R.id.ridename);
+		rideName.setText("Ride: " + rideNameString);
+
+		// Start some managers
+		vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+		mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+		// Waffles ares UI messages, and fields are used in recording
+		w = new Waffle(this);
+		f = new Fields();
+
+		// These are arrays that store values we may record. Who knows, maybe we'll use them.
+		accel = new float[4];
+		orientation = new float[3];
+		rawAccel = new float[3];
+		rawMag = new float[3];
+		mag = new float[3];
+		
+		// Fire up the GPS chip (not literally)
+		initLocManager();
+
+		
+
+		// Most important feature. Makes the button beep.
+		mMediaPlayer = MediaPlayer.create(this, R.raw.beep);
+	}
+
+	
+
+	/**
+	 * Set all dfm's fields to enabled. 
+	 */
+	private void enableAllFields() {
+		setUpDFMWithAllFields();
+	}
+	
+	//set up GPS
+	private void initLocManager() {
+		Criteria c = new Criteria();
+		c.setAccuracy(Criteria.ACCURACY_FINE);
+
+		mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		mRoughLocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+		if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+				&& mRoughLocManager
+						.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+
+			mLocationManager.requestLocationUpdates(
+					mLocationManager.getBestProvider(c, true), 0, 0, CarRampPhysicsV2.this);
+			mRoughLocManager.requestLocationUpdates(
+					LocationManager.NETWORK_PROVIDER, 0, 0, CarRampPhysicsV2.this);
+		} else {
+			
+		}
+		
+		// This is the location we will get back from GPS
+		loc = new Location(mLocationManager.getBestProvider(c, true));
+		
+	}
+	
+	
+
+	private void initDfm() {
+
+		SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
+		String projectInput = mPrefs.getString(Setup.PROJECT_ID, "");
+
+		if (projectInput.equals("-1")) {
+			setUpDFMWithAllFields();
+		} else {
+			dfm = new DataFieldManager(Integer.parseInt(projectInput), api,
+					mContext, f);
+			dfm.getOrder();
+
+			String fields = mPrefs.getString("accepted_fields", "");
+			getFieldsFromPrefsString(fields);
+			getEnabledFields();
+
+		}
+	}
+	
+	private void setUpDFMWithAllFields() {
+		SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
+		SharedPreferences.Editor mEdit = mPrefs.edit();
+		mEdit.putString(Setup.PROJECT_ID, "-1").commit();
+
+		dfm = new DataFieldManager(Integer.parseInt(mPrefs.getString(
+				Setup.PROJECT_ID, "-1")), api, mContext, f);
+		dfm.getOrder();
+
+		dfm.enableAllFields();
+
+		String acceptedFields = getResources().getString(R.string.time) + ","
+				+ getResources().getString(R.string.accel_x) + ","
+				+ getResources().getString(R.string.accel_y) + ","
+				+ getResources().getString(R.string.accel_z) + ","
+				+ getResources().getString(R.string.accel_total) + ","
+				+ getResources().getString(R.string.latitude) + ","
+				+ getResources().getString(R.string.longitude) + ","
+				+ getResources().getString(R.string.magnetic_x) + ","
+				+ getResources().getString(R.string.magnetic_y) + ","
+				+ getResources().getString(R.string.magnetic_z) + ","
+				+ getResources().getString(R.string.magnetic_total) + ","
+				+ getResources().getString(R.string.heading_deg) + ","
+				+ getResources().getString(R.string.heading_rad) + ","
+				+ getResources().getString(R.string.temperature_c) + ","
+				+ getResources().getString(R.string.pressure) + ","
+				+ getResources().getString(R.string.altitude) + ","
+				+ getResources().getString(R.string.luminous_flux) + ","
+				+ getResources().getString(R.string.temperature_f) + ","
+				+ getResources().getString(R.string.temperature_k);
+
+		mEdit.putString("accepted_fields", acceptedFields).commit();
+	}
+
+	// (currently 2 of these methods exist - one also in step1setup)
+		private void getEnabledFields() {
+			try {
+				for (String s : acceptedFields) {
+					if (s.length() != 0)
+						break;
+				}
+			} catch (NullPointerException e) {
+				SharedPreferences mPrefs = getSharedPreferences("PROJID", 0);
+				String fields = mPrefs.getString("accepted_fields", "");
+				getFieldsFromPrefsString(fields);
+			}
+
+			for (String s : acceptedFields) {
+				if (s.equals(getString(R.string.time)))
+					dfm.enabledFields[Fields.TIME] = true;
+
+				else if (s.equals(getString(R.string.accel_x)))
+					dfm.enabledFields[Fields.ACCEL_X] = true;
+
+				else if (s.equals(getString(R.string.accel_y)))
+					dfm.enabledFields[Fields.ACCEL_Y] = true;
+
+				else if (s.equals(getString(R.string.accel_z)))
+					dfm.enabledFields[Fields.ACCEL_Z] = true;
+
+				else if (s.equals(getString(R.string.accel_total)))
+					dfm.enabledFields[Fields.ACCEL_TOTAL] = true;
+
+				else if (s.equals(getString(R.string.latitude)))
+					dfm.enabledFields[Fields.LATITUDE] = true;
+
+				else if (s.equals(getString(R.string.longitude)))
+					dfm.enabledFields[Fields.LONGITUDE] = true;
+
+				else if (s.equals(getString(R.string.magnetic_x)))
+					dfm.enabledFields[Fields.MAG_X] = true;
+
+				else if (s.equals(getString(R.string.magnetic_y)))
+					dfm.enabledFields[Fields.MAG_Y] = true;
+
+				else if (s.equals(getString(R.string.magnetic_z)))
+					dfm.enabledFields[Fields.MAG_Z] = true;
+
+				else if (s.equals(getString(R.string.magnetic_total)))
+					dfm.enabledFields[Fields.MAG_TOTAL] = true;
+
+				else if (s.equals(getString(R.string.heading_deg)))
+					dfm.enabledFields[Fields.HEADING_DEG] = true;
+
+				else if (s.equals(getString(R.string.heading_rad)))
+					dfm.enabledFields[Fields.HEADING_RAD] = true;
+
+				else if (s.equals(getString(R.string.temperature_c)))
+					dfm.enabledFields[Fields.TEMPERATURE_C] = true;
+
+				else if (s.equals(getString(R.string.temperature_f)))
+					dfm.enabledFields[Fields.TEMPERATURE_F] = true;
+
+				else if (s.equals(getString(R.string.temperature_k)))
+					dfm.enabledFields[Fields.TEMPERATURE_K] = true;
+
+				else if (s.equals(getString(R.string.pressure)))
+					dfm.enabledFields[Fields.PRESSURE] = true;
+
+				else if (s.equals(getString(R.string.altitude)))
+					dfm.enabledFields[Fields.ALTITUDE] = true;
+
+				else if (s.equals(getString(R.string.luminous_flux)))
+					dfm.enabledFields[Fields.LIGHT] = true;
+
+			}
+		}
+
+		private void getFieldsFromPrefsString(String fieldList) {
+
+			String[] fields = fieldList.split(",");
+			acceptedFields = new LinkedList<String>();
+
+			for (String f : fields) {
+				acceptedFields.add(f);
+			}
+		}
+	
+
+	/**
+	 * Prompts the user to upload the rest of their content
+	 * upon successful upload of data.
+	 */
 	private void manageUploadQueue() {
-
 		if (!uq.emptyQueue()) {
 			Intent i = new Intent().setClass(mContext, QueueLayout.class);
 			i.putExtra(QueueLayout.PARENT_NAME, uq.getParentName());
 			startActivityForResult(i, QUEUE_UPLOAD_REQUESTED);
 		} else {
-			w.make("There are no data to upload!", Waffle.LENGTH_LONG,
-					Waffle.IMAGE_X);
+			w.make("No data to upload!", Waffle.IMAGE_X);
+		}
+	}
+	
+	/**
+	 * Turns elapsedMillis into readable strings.
+	 * 
+	 * @author jpoulin
+	 */
+	private class ElapsedTime {
+		private String elapsedSeconds;
+		private String elapsedMinutes;
+		
+		/**
+		 * Everybody likes strings.
+		 * 
+		 * @param seconds
+		 */
+		
+		
+		ElapsedTime(int seconds) {
+			int minutes;
+			
+			minutes = seconds / 60;
+			seconds %= 60;
+			
+			if (seconds < 10) {
+				elapsedSeconds = "0" + seconds;
+			} else {
+				elapsedSeconds = "" + seconds;
+			}
+
+
+			if (minutes < 10) {
+				elapsedMinutes = "0" + minutes;
+			} else {
+				elapsedMinutes = "" + minutes;
+			}		
+		}
+		
+	}
+
+	/**
+	 * Makes a summary dialog.
+	 * @param date Time of upload
+	 * @param sdFileName Name of the written csv
+	 */
+	private void showSummary(Date date, String sdFileName) {
+		ElapsedTime time = new ElapsedTime(elapsedSecs);
+		
+		Intent iSummary = new Intent(mContext, Summary.class);
+		iSummary.putExtra("seconds", time.elapsedSeconds)
+				.putExtra("minutes", time.elapsedMinutes)
+				.putExtra("date", getNiceDateString(date))
+				.putExtra("points", "" + dataPointCount);
+
+		startActivity(iSummary);
+
+	}
+
+	/**
+	 * Turns on only the sensors you need to record data.
+	 */
+	@SuppressLint("InlinedApi")
+	private void registerSensors() {
+		if (mSensorManager != null && setupDone && dfm != null) {
+
+			if (dfm.enabledFields[Fields.ACCEL_X]
+					|| dfm.enabledFields[Fields.ACCEL_Y]
+					|| dfm.enabledFields[Fields.ACCEL_Z]
+					|| dfm.enabledFields[Fields.ACCEL_TOTAL]) {
+				mSensorManager.registerListener(CarRampPhysicsV2.this,
+						mSensorManager
+								.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+						SensorManager.SENSOR_DELAY_FASTEST);
+			}
+
+			if (dfm.enabledFields[Fields.MAG_X]
+					|| dfm.enabledFields[Fields.MAG_Y]
+					|| dfm.enabledFields[Fields.MAG_Z]
+					|| dfm.enabledFields[Fields.MAG_TOTAL]
+					|| dfm.enabledFields[Fields.HEADING_DEG]
+					|| dfm.enabledFields[Fields.HEADING_RAD]) {
+				mSensorManager.registerListener(CarRampPhysicsV2.this,
+						mSensorManager
+								.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
+						SensorManager.SENSOR_DELAY_FASTEST);
+			}
+
+			if (dfm.enabledFields[Fields.TEMPERATURE_C]
+					|| dfm.enabledFields[Fields.TEMPERATURE_F]
+					|| dfm.enabledFields[Fields.TEMPERATURE_K]
+					|| dfm.enabledFields[Fields.ALTITUDE]) {
+				if (getApiLevel() >= 14) {
+					mSensorManager
+							.registerListener(
+									CarRampPhysicsV2.this,
+									mSensorManager
+											.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE),
+									SensorManager.SENSOR_DELAY_FASTEST);
+				}
+			}
+
+			if (dfm.enabledFields[Fields.PRESSURE]
+					|| dfm.enabledFields[Fields.ALTITUDE]) {
+				mSensorManager.registerListener(CarRampPhysicsV2.this,
+						mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE),
+						SensorManager.SENSOR_DELAY_FASTEST);
+			}
+
+			if (dfm.enabledFields[Fields.LIGHT]) {
+				mSensorManager.registerListener(CarRampPhysicsV2.this,
+						mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT),
+						SensorManager.SENSOR_DELAY_FASTEST);
+			}
+
 		}
 	}
 
-	public void createMessageDialog(String title, String message, int reqCode) {
+	/**
+	 * Records a data point, puts it into the dataSet object, and writes it to a csv string.
+	 */
+	private void recordData() {
+		 dataPointCount++;
+         DecimalFormat toThou = new DecimalFormat("######0.000");
 
-		Intent i = new Intent(mContext, MessageDialogTemplate.class);
-		i.putExtra("title", title);
-		i.putExtra("message", message);
+         if (dfm.enabledFields[Fields.ACCEL_X])
+                 f.accel_x = toThou.format(accel[0]);
+         if (dfm.enabledFields[Fields.ACCEL_Y])
+                 f.accel_y = toThou.format(accel[1]);
+         if (dfm.enabledFields[Fields.ACCEL_Z])
+                 f.accel_z = toThou.format(accel[2]);
+         if (dfm.enabledFields[Fields.ACCEL_TOTAL])
+                 f.accel_total = toThou.format(accel[3]);
+         if (dfm.enabledFields[Fields.LATITUDE])
+                 f.latitude = loc.getLatitude();
+         if (dfm.enabledFields[Fields.LONGITUDE])
+                 f.longitude = loc.getLongitude();
+         if (dfm.enabledFields[Fields.HEADING_DEG])
+ 				 f.angle_deg = toThou.format(orientation[0]);
+         if (dfm.enabledFields[Fields.HEADING_RAD])
+        	 if (!f.angle_deg.equals(""))
+ 				f.angle_rad = toThou
+ 						.format((Double.parseDouble(f.angle_deg) * (Math.PI / 180)));
+ 			else
+ 				f.angle_rad = "";
+         if (dfm.enabledFields[Fields.MAG_X])
+                 f.mag_x = "" + mag[0];
+         if (dfm.enabledFields[Fields.MAG_Y])
+                 f.mag_y = "" + mag[1];
+         if (dfm.enabledFields[Fields.MAG_Z])
+                 f.mag_z = "" + mag[2];
+         if (dfm.enabledFields[Fields.MAG_TOTAL])
+                 f.mag_total = "" + Math.sqrt(Math.pow(Double.parseDouble(f.mag_x), 2)
+		                                 + Math.pow(Double.parseDouble(f.mag_y), 2)
+		                                 + Math.pow(Double.parseDouble(f.mag_z), 2));
+         if (dfm.enabledFields[Fields.TIME])
+                 f.timeMillis = System.currentTimeMillis();         
+         if (dfm.enabledFields[Fields.TEMPERATURE_C])
+                 f.temperature_c = temperature;
+         if (dfm.enabledFields[Fields.TEMPERATURE_F])
+                 if (temperature.equals(""))
+                         f.temperature_f = temperature;
+                 else
+                         f.temperature_f = "" + ((Double.parseDouble(temperature) * 1.8) + 32);
+         if (dfm.enabledFields[Fields.TEMPERATURE_K])
+                 if (temperature.equals(""))
+                         f.temperature_k = temperature;
+                 else
+                         f.temperature_k = "" + (Double.parseDouble(temperature) + 273.15);
+         if (dfm.enabledFields[Fields.PRESSURE])
+                 f.pressure = pressure;
+         if (dfm.enabledFields[Fields.ALTITUDE])
+                 f.altitude = "" + loc.getAltitude();
+         if (dfm.enabledFields[Fields.LIGHT])
+                 f.lux = light;
 
-		startActivityForResult(i, reqCode);
+         dataSet.put(dfm.putData());
+         dataToBeWrittenToFile = dfm.writeSdCardLine();
 
-	}
-
-	public void createSingleInputDialog(String title, String message,
-			int reqCode) {
-
-		Intent i = new Intent(mContext, SingleInputDialogTemplate.class);
-		i.putExtra("title", title);
-		i.putExtra("message", message);
-
-		startActivityForResult(i, reqCode);
-
-	}
-
-    /**
-     *
-     */
-    private void setUpNoProject() {
-        CarRampPhysicsV2.projectNumber = "-1";
-        dfm = new DataFieldManager(Integer.parseInt(projectNumber),
-                api, mContext, f);
-        dfm.getOrder();
-        DecimalFormat oneDigit = new DecimalFormat("#,##0.0");
-        if (dfm.getOrderList().contains(
-                mContext.getString(R.string.accel_x))) {
-            values.setText("X: " + oneDigit.format(accel[0]));
-        }
-        if (dfm.getOrderList().contains(
-                mContext.getString(R.string.accel_y))) {
-            if (dfm.getOrderList().contains(
-                    mContext.getString(R.string.accel_x))) {
-                values.setText(values.getText() + " Y: "
-                        + oneDigit.format(accel[1]));
-            } else {
-                values.setText("Y: " + oneDigit.format(accel[1]));
-            }
-        }
-        if (dfm.getOrderList().contains(
-                mContext.getString(R.string.accel_z))) {
-            if (dfm.getOrderList().contains(
-                    mContext.getString(R.string.accel_x))
-                    || dfm.getOrderList().contains(
-                            mContext.getString(R.string.accel_y))) {
-                values.setText(values.getText() + " Z: "
-                        + oneDigit.format(accel[2]));
-            } else {
-                values.setText("Z: " + oneDigit.format(accel[2]));
-            }
-
-        }
-        if (dfm.getOrderList().contains(
-                mContext.getString(R.string.accel_total))) {
-            accel[3] = (float) Math.sqrt(Math.pow(accel[0], 2)
-                    + Math.pow(accel[1], 2) + Math.pow(accel[2], 2));
-
-            if (dfm.getOrderList().contains(
-                    mContext.getString(R.string.accel_x))
-                    || dfm.getOrderList().contains(
-                            mContext.getString(R.string.accel_y))
-                    || dfm.getOrderList().contains(
-                            mContext.getString(R.string.accel_z))) {
-                values.setText(values.getText() + " Magnitude: "
-                        + oneDigit.format(accel[3]));
-            } else {
-                values.setText("Magnitude: "
-                        + oneDigit.format(accel[3]));
-            }
-
-        }
-
-    }
-
-	@Override
-	public void onProviderDisabled(String arg0) {
-	}
-
-	@Override
-	public void onProviderEnabled(String arg0) {
-	}
-
-	@Override
-	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
-	}
-
-	@Override
-	public void onAccuracyChanged(Sensor arg0, int arg1) {
 	}
 
 }

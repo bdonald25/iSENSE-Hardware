@@ -1,4 +1,4 @@
-package edu.uml.cs.isense.canobiev2;
+package edu.uml.cs.isense.carphysicsv2;
 
 import android.app.Activity;
 import android.os.Bundle;

@@ -1,6 +1,5 @@
-package edu.uml.cs.isense.canobiev2;
+package edu.uml.cs.isense.carphysicsv2;
 
-import edu.uml.cs.isense.proj.Setup;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,6 +15,8 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.Spinner;
+
+import edu.uml.cs.isense.proj.Setup;
 
 public class Configuration extends Activity {
 	private static EditText dataset; 
@@ -42,8 +43,8 @@ public class Configuration extends Activity {
 		ok = (Button) findViewById(R.id.ok);
 		select = (Button) findViewById(R.id.selectButton);		 
 		
-		dataset.setText(AmusementPark.dataName);
-		sampleRate.setText(AmusementPark.rate);
+		dataset.setText(CarRampPhysicsV2.dataName);
+		sampleRate.setText(CarRampPhysicsV2.rate);
 		
 		/*Setup Addapter for rides*/
 		
@@ -60,8 +61,8 @@ public class Configuration extends Activity {
 		  		 .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		  
 		  /*Set up checkboxes*/
-		  projectLater.setChecked(AmusementPark.projectLaterChecked);
-		  isCanobie.setChecked(AmusementPark.canobieChecked);
+		  projectLater.setChecked(CarRampPhysicsV2.projectLaterChecked);
+		  isCanobie.setChecked(CarRampPhysicsV2.canobieChecked);
 
 		if (projectLater.isChecked()) {
 			select.setEnabled(false);
@@ -74,13 +75,13 @@ public class Configuration extends Activity {
 		else
 			rides.setAdapter(generalAdapter);
 		
-		rides.setSelection(AmusementPark.spinnerid);
+		rides.setSelection(CarRampPhysicsV2.spinnerid);
 		
 		rides.setOnItemSelectedListener(new OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> arg0, View arg1,
 					int arg2, long arg3) {
-				AmusementPark.spinnerid = arg2;
+				CarRampPhysicsV2.spinnerid = arg2;
 				
 			}
 
@@ -115,9 +116,9 @@ public class Configuration extends Activity {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView,
 					boolean isChecked) {
-				AmusementPark.projectLaterChecked = projectLater.isChecked();
+				CarRampPhysicsV2.projectLaterChecked = projectLater.isChecked();
 				if (projectLater.isChecked()) {
-					AmusementPark.projectNum = -1; 
+					CarRampPhysicsV2.projectNum = -1;
 					
 					select.setError(null);
 					
@@ -138,7 +139,7 @@ public class Configuration extends Activity {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView,
 					boolean isChecked) {
-				AmusementPark.canobieChecked = isCanobie.isChecked();
+				CarRampPhysicsV2.canobieChecked = isCanobie.isChecked();
 				if (isCanobie.isChecked()) { 
 					rides.setAdapter(canobieAdapter);
 				} else {
@@ -170,7 +171,7 @@ public class Configuration extends Activity {
 			public void onClick(View v) {
 
 				if(everythingSelected() == true) {	
-					AmusementPark.setupDone = true;
+					CarRampPhysicsV2.setupDone = true;
 					finish();
 				} else {
 					return;
@@ -188,13 +189,13 @@ public class Configuration extends Activity {
 			selected = false;
 		} else {
 			dataset.setError(null);
-			AmusementPark.dataName = dataset.getText().toString();
+			CarRampPhysicsV2.dataName = dataset.getText().toString();
 		}
 		
 		/* check if project later is checked */
 		
 		if(!projectLater.isChecked()) {
-			if (AmusementPark.projectNum == -1) {
+			if (CarRampPhysicsV2.projectNum == -1) {
 				selected = false;
 				select.setError("Please Select a Project.");
 			} else {
@@ -214,12 +215,12 @@ public class Configuration extends Activity {
 				selected = false;
 			} else {
 				sampleRate.setError(null);
-				AmusementPark.rate = sampleRate.getText().toString();		
+				CarRampPhysicsV2.rate = sampleRate.getText().toString();
 			}
 			
 		}
 		
-		AmusementPark.rideNameString = rides.getSelectedItem().toString();
+		CarRampPhysicsV2.rideNameString = rides.getSelectedItem().toString();
 		
 		return selected;
 	}
@@ -230,7 +231,7 @@ public class Configuration extends Activity {
         	 
         	SharedPreferences mPrefs = getSharedPreferences(Setup.PROJ_PREFS_ID, 0);
         	String eidString = mPrefs.getString(Setup.PROJECT_ID, "");
-			AmusementPark.projectNum = Integer.parseInt(eidString);
+			CarRampPhysicsV2.projectNum = Integer.parseInt(eidString);
 			
          }
      }
