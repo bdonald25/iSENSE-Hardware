@@ -1,15 +1,5 @@
 package edu.uml.cs.isense.riverwalk;
 
-import java.io.File;
-import java.util.ArrayList;
-
-
-import edu.uml.cs.isense.comm.API;
-import edu.uml.cs.isense.comm.API.TargetType;
-import edu.uml.cs.isense.credentials.CredentialManager;
-import edu.uml.cs.isense.credentials.CredentialManagerKey;
-import edu.uml.cs.isense.proj.Setup;
-import edu.uml.cs.isense.waffle.Waffle;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -22,6 +12,16 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+
+import java.io.File;
+import java.util.ArrayList;
+
+import edu.uml.cs.isense.comm.API;
+import edu.uml.cs.isense.comm.API.TargetType;
+import edu.uml.cs.isense.credentials.CredentialManager;
+import edu.uml.cs.isense.credentials.CredentialManagerKey;
+import edu.uml.cs.isense.proj.Setup;
+import edu.uml.cs.isense.waffle.Waffle;
 
 
 public class SharePicture extends Activity {
