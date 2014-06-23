@@ -45,6 +45,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Timer;
@@ -72,7 +73,7 @@ public class Main extends Activity implements LocationListener {
 	private static final int CAMERA_PIC_REQUESTED = 101;
 	private static final int LOGIN_REQUESTED = 102;
 	private static final int NO_GPS_REQUESTED = 103;
-	private static final int project_REQUESTED = 104;
+	private static final int PROJECT_REQUESTED = 104;
 	private static final int QUEUE_UPLOAD_REQUESTED = 105;
 	private static final int DESCRIPTION_REQUESTED = 106;
 	private static final int SELECT_PICTURE_REQUESTED = 107;
@@ -88,8 +89,6 @@ public class Main extends Activity implements LocationListener {
 	private LocationManager mLocationManager;
 	private LocationManager mRoughLocManager;
 	private Location loc;
-
-	private Uri imageUri;
 
 	public static API api;
 	public static UploadQueue uq;
@@ -133,6 +132,10 @@ public class Main extends Activity implements LocationListener {
 	private static Camera mCamera;
 	private CameraPreview mPreview;
 	private FrameLayout preview;
+
+    ArrayList<Uri> imageUris = new ArrayList<Uri>();
+    ArrayList<File> imageFiles = new ArrayList<File>();
+    Uri imageUri;
 	
 	@SuppressLint("NewApi")
 	@Override
@@ -306,9 +309,11 @@ public class Main extends Activity implements LocationListener {
 					name.setError(null);
 				}
 
+                //TODO handle multiple images
+
 				Intent intent = new Intent(Intent.ACTION_PICK);
                 intent.setType("image/*");
-//                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 startActivityForResult(
 						Intent.createChooser(intent, "Select Picture"),
 						SELECT_PICTURE_REQUESTED);
@@ -633,7 +638,7 @@ public class Main extends Activity implements LocationListener {
 					Setup.class);
 			iproject.putExtra("constrictFields", true);
 			iproject.putExtra("app_name", "Pictures");
-			startActivityForResult(iproject, project_REQUESTED);
+			startActivityForResult(iproject, PROJECT_REQUESTED);
 			return true;
 
 		case R.id.MENU_ITEM_LOGIN:
@@ -752,7 +757,7 @@ public class Main extends Activity implements LocationListener {
 			w.make("No data to upload.", Waffle.IMAGE_X);
 			return;
 		}
-		//TODO
+
 		Intent i = new Intent().setClass(mContext, QueueLayout.class);
 		i.putExtra(QueueLayout.PARENT_NAME, uq.getParentName());
 		startActivityForResult(i, QUEUE_UPLOAD_REQUESTED);
@@ -775,8 +780,6 @@ public class Main extends Activity implements LocationListener {
 	}
 
 	public static File convertImageUriToFile(Uri imageUri, Context c) {
-            Log.e("BOBBY URI !!! ", imageUri.toString());
-
 			String[] proj = { MediaStore.Images.Media.DATA,
 					MediaStore.Images.Media._ID };
 
@@ -899,7 +902,7 @@ public class Main extends Activity implements LocationListener {
 
 			}
 
-		} else if (requestCode == project_REQUESTED) { // obtains data fields
+		} else if (requestCode == PROJECT_REQUESTED) { // obtains data fields
 															// from project on
 															// isense
 			if (resultCode == Activity.RESULT_OK) {
@@ -941,6 +944,7 @@ public class Main extends Activity implements LocationListener {
 			if (resultCode == Activity.RESULT_OK) {
 
                 Uri selectedImageUri = data.getData();
+
 				String[] filePathColumn = { MediaStore.Images.Media.DATA };
 				Cursor cursor = getContentResolver().query(selectedImageUri,
 						filePathColumn, null, null, null);
@@ -949,9 +953,10 @@ public class Main extends Activity implements LocationListener {
 				String picturePath = cursor.getString(columnIndex);
 				cursor.close();
 
-				picture = new File(picturePath);
+                picture = new File(picturePath);
 
 
+                //TODO handle multiple images
 				
 				/*get data from picture file*/
 				ExifInterface exifInterface;
@@ -1000,7 +1005,6 @@ public class Main extends Activity implements LocationListener {
 					}
 
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 

@@ -134,7 +134,7 @@ public class SharePicture extends Activity {
 
 	}
 
-	 void handleSendImage(Intent intent) {
+	void handleSendImage(Intent intent) {
 		imageUris.add((Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM));	}
 
 	void handleSendMultipleImages(Intent intent) {
